@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1><i class="fas fa-file-alt"></i> Resume Builder</h1>
+            <div class="header-actions">
+                <select id="templateSelect" class="template-selector">
+                    <option value="minimal">Minimal</option>
+                    <option value="creative">Creative</option>
+                    <option value="corporate">Corporate</option>
+                </select>
+                <button id="exportBtn" class="export-btn">
+                    <i class="fas fa-file-export"></i> Export Resume
+                </button>
+                <button id="importBtn" class="import-btn">
+                    <i class="fas fa-file-import"></i> Import Resume
+                </button>
+                <button id="saveBtn" class="save-btn">
+                    <i class="fas fa-save"></i> Save Resume
+                </button>
+                <button id="loadBtn" class="load-btn">
+                    <i class="fas fa-upload"></i> Load Resume
+                </button>
+                <button id="resetBtn" class="reset-btn">
+                    <i class="fas fa-refresh"></i> Reset to Template
+                </button>
+                <button id="shareBtn" class="share-btn">
+                    <i class="fas fa-share"></i> Share
+                </button>
+                <button id="downloadBtn" class="download-btn">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="form-section">
+                <div class="form-container">
+                    <h2>Build Your Resume</h2>
+                    
+                    <!-- Personal Details -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-user"></i> Personal Details</h3>
+                        <div class="input-row">
+                            <input type="text" id="fullName" placeholder="Full Name" required>
+                            <input type="text" id="title" placeholder="Professional Title">
+                        </div>
+                        <div class="input-row">
+                            <input type="email" id="email" placeholder="Email">
+                            <input type="tel" id="phone" placeholder="Phone">
+                        </div>
+                        <input type="text" id="location" placeholder="Location">
+                        
+                        <!-- Profile Picture Upload -->
+                        <div class="profile-upload">
+                            <label for="profilePic" class="upload-label">
+                                <i class="fas fa-camera"></i> Upload Profile Picture
+                            </label>
+                            <input type="file" id="profilePic" accept="image/*" style="display: none;">
+                            <div id="profilePreview" class="profile-preview"></div>
+                        </div>
+                    </div>
+
+                    <!-- Professional Summary -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-quote-left"></i> Professional Summary</h3>
+                        <textarea id="summary" placeholder="Write a brief professional summary..." rows="4"></textarea>
+                    </div>
+
+                    <!-- Work Experience -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-briefcase"></i> Work Experience</h3>
+                        <div id="experienceContainer">
+                            <div class="experience-item">
+                                <div class="input-row">
+                                    <input type="text" class="jobTitle" placeholder="Job Title">
+                                    <input type="text" class="company" placeholder="Company">
+                                </div>
+                                <div class="input-row">
+                                    <input type="text" class="startDate" placeholder="Start Date">
+                                    <input type="text" class="endDate" placeholder="End Date">
+                                </div>
+                                <textarea class="jobDescription" placeholder="Job description and achievements..." rows="3"></textarea>
+                                <button type="button" class="remove-btn" onclick="removeExperience(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addExperience" class="add-btn">
+                            <i class="fas fa-plus"></i> Add Experience
+                        </button>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-graduation-cap"></i> Education</h3>
+                        <div id="educationContainer">
+                            <div class="education-item">
+                                <div class="input-row">
+                                    <input type="text" class="degree" placeholder="Degree">
+                                    <input type="text" class="school" placeholder="School/University">
+                                </div>
+                                <div class="input-row">
+                                    <input type="text" class="gradYear" placeholder="Graduation Year">
+                                    <input type="text" class="gpa" placeholder="GPA (optional)">
+                                </div>
+                                <button type="button" class="remove-btn" onclick="removeEducation(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addEducation" class="add-btn">
+                            <i class="fas fa-plus"></i> Add Education
+                        </button>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-cogs"></i> Skills</h3>
+                        <div id="skillsContainer">
+                            <div class="skill-item">
+                                <input type="text" class="skillName" placeholder="Skill name">
+                                <select class="skillLevel">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                    <option value="Expert">Expert</option>
+                                </select>
+                                <button type="button" class="remove-btn" onclick="removeSkill(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addSkill" class="add-btn">
+                            <i class="fas fa-plus"></i> Add Skill
+                        </button>
+                    </div>
+
+                    <!-- Projects -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-project-diagram"></i> Projects</h3>
+                        <div id="projectsContainer">
+                            <div class="project-item">
+                                <input type="text" class="projectName" placeholder="Project Name">
+                                <textarea class="projectDescription" placeholder="Project description..." rows="2"></textarea>
+                                <input type="url" class="projectLink" placeholder="Project URL (optional)">
+                                <button type="button" class="remove-btn" onclick="removeProject(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addProject" class="add-btn">
+                            <i class="fas fa-plus"></i> Add Project
+                        </button>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-link"></i> Social Links</h3>
+                        <input type="url" id="linkedin" placeholder="LinkedIn URL">
+                        <input type="url" id="github" placeholder="GitHub URL">
+                        <input type="url" id="portfolio" placeholder="Portfolio URL">
+                    </div>
+
+                    <!-- Certifications -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-certificate"></i> Certifications</h3>
+                        <div id="certificationsContainer">
+                            <div class="certification-item">
+                                <input type="text" class="certificationName" placeholder="Certification Name">
+                                <button type="button" class="remove-btn" onclick="removeCertification(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addCertification" class="add-btn">
+                            <i class="fas fa-plus"></i> Add Certification
+                        </button>
+                    </div>
+
+                    <!-- Languages -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-language"></i> Languages</h3>
+                        <div id="languagesContainer">
+                            <div class="language-item">
+                                <input type="text" class="languageName" placeholder="Language & Proficiency">
+                                <button type="button" class="remove-btn" onclick="removeLanguage(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addLanguage" class="add-btn">
+                            <i class="fas fa-plus"></i> Add Language
+                        </button>
+                    </div>
+
+                    <!-- Hobbies -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-heart"></i> Hobbies & Interests</h3>
+                        <div id="hobbiesContainer">
+                            <div class="hobby-item">
+                                <input type="text" class="hobbyName" placeholder="Hobby or Interest">
+                                <button type="button" class="remove-btn" onclick="removeHobby(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="addHobby" class="add-btn">
+                            <i class="fas fa-plus"></i> Add Hobby
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <div class="preview-header">
+                    <h2>Live Preview</h2>
+                    <div class="theme-controls">
+                        <label>Theme:</label>
+                        <button id="themeToggle" class="theme-toggle">
+                            <i class="fas fa-moon"></i> Dark
+                        </button>
+                        <input type="color" id="primaryColor" value="#2563eb">
+                        <select id="fontFamily">
+                            <option value="Inter">Inter</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="resume-preview" id="resumePreview">
+                    <!-- Resume preview will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input for loading resume -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+    
+    <!-- Hidden file input for importing resume -->
+    <input type="file" id="importInput" accept=".json" style="display: none;">
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share"></i> Share Resume</h3>
+                <button class="close-btn" onclick="closeShareModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Choose how you want to share your resume:</p>
+                
+                <div class="share-options">
+                    <button id="shareFileBtn" class="share-option-btn">
+                        <i class="fas fa-file-download"></i>
+                        <div>
+                            <strong>Download Resume File</strong>
+                            <small>Save as .json file to share via WhatsApp/Email</small>
+                        </div>
+                    </button>
+                    
+                    <button id="shareLinkBtn" class="share-option-btn">
+                        <i class="fas fa-link"></i>
+                        <div>
+                            <strong>Copy Shareable Link</strong>
+                            <small>Generate a link with resume data</small>
+                        </div>
+                    </button>
+                    
+                    <button id="shareWhatsAppBtn" class="share-option-btn whatsapp">
+                        <i class="fab fa-whatsapp"></i>
+                        <div>
+                            <strong>Share via WhatsApp</strong>
+                            <small>Send resume file directly</small>
+                        </div>
+                    </button>
+                </div>
+                
+                <div id="shareResult" class="share-result" style="display: none;">
+                    <textarea id="shareText" readonly></textarea>
+                    <button id="copyBtn" class="copy-btn">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
