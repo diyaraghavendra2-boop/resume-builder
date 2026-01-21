@@ -1236,41 +1236,425 @@ class ResumeBuilder {
     }
 
     // Placeholder methods for missing functionality
-    saveResume() { console.log('Save functionality not implemented'); }
-    loadResume() { console.log('Load functionality not implemented'); }
-    shareAsFile() { console.log('Share as file functionality not implemented'); }
-    shareViaWhatsApp() { console.log('WhatsApp share functionality not implemented'); }
-    downloadPDF() { console.log('PDF download functionality not implemented'); }
-    handleProfilePicture() { console.log('Profile picture functionality not implemented'); }
+    saveResume() {
+        const resumeData = {
+            ...this.resumeData,
+            settings: {
+                template: this.currentTemplate,
+                primaryColor: this.primaryColor,
+                fontFamily: this.fontFamily,
+                isDarkTheme: this.isDarkTheme
+            }
+        };
+
+        const dataStr = JSON.stringify(resumeData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${this.resumeData.personal.fullName || 'Resume'}_Data.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        // Show success message
+        const saveBtn = document.getElementById('saveBtn');
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+        setTimeout(() => {
+            saveBtn.innerHTML = originalText;
+        }, 2000);
+    }
+
+    loadResume() {
+        document.getElementById('fileInput').click();
+    }
+
+    handleFileLoad(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                this.loadResumeData(data);
+                
+                // Show success message
+                const loadBtn = document.getElementById('loadBtn');
+                const originalText = loadBtn.innerHTML;
+                loadBtn.innerHTML = '<i class="fas fa-check"></i> Loaded!';
+                setTimeout(() => {
+                    loadBtn.innerHTML = originalText;
+                }, 2000);
+            } catch (error) {
+                alert('Error loading resume file. Please check the file format.');
+                console.error('Error loading resume:', error);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    shareAsFile() {
+        this.saveResume();
+        this.showShareResult('Resume file downloaded! You can now share this .json file via WhatsApp, email, or any messaging app. Your friend can load it using the "Load Resume" button.');
+    }
+
+    shareViaWhatsApp() {
+        const resumeData = {
+            ...this.resumeData,
+            settings: {
+                template: this.currentTemplate,
+                primaryColor: this.primaryColor,
+                fontFamily: this.fontFamily,
+                isDarkTheme: this.isDarkTheme
+            }
+        };
+
+        const message = `Hi! I've created my resume using a Resume Builder. Here's the data you can use to view and edit it:\n\n${JSON.stringify(resumeData, null, 2)}\n\nJust copy this data and load it in the Resume Builder!`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        
+        window.open(whatsappUrl, '_blank');
+        this.closeShareModal();
+    }
+    async downloadPDF() {
+        const element = document.getElementById('resumePreview');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        // Show loading state
+        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+        downloadBtn.disabled = true;
+        
+        try {
+            const opt = {
+                margin: 0.5,
+                filename: `${this.resumeData.personal.fullName || 'Resume'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
+            };
+            
+            await html2pdf().set(opt).from(element).save();
+        } catch (error) {
+            console.error('PDF generation failed:', error);
+            alert('Failed to generate PDF. Please try again.');
+        } finally {
+            // Reset button state
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+            downloadBtn.disabled = false;
+        }
+    }
+    handleProfilePicture(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Crop to square
+                    const size = Math.min(img.width, img.height);
+                    canvas.width = 300;
+                    canvas.height = 300;
+                    
+                    const offsetX = (img.width - size) / 2;
+                    const offsetY = (img.height - size) / 2;
+                    
+                    ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, 300, 300);
+                    
+                    const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    this.resumeData.personal.profilePicture = croppedDataUrl;
+                    
+                    // Show preview
+                    const preview = document.getElementById('profilePreview');
+                    preview.innerHTML = `<img src="${croppedDataUrl}" alt="Profile">`;
+                    
+                    this.updatePreview();
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+    }
     
-    // Placeholder methods for dynamic sections
-    addExperienceItem() { console.log('Add experience functionality not implemented'); }
-    updateExperienceListeners() { console.log('Experience listeners not implemented'); }
-    updateExperienceData() { console.log('Experience data update not implemented'); }
+    // Experience functionality
+    addExperienceItem() {
+        const container = document.getElementById('experienceContainer');
+        const item = document.createElement('div');
+        item.className = 'experience-item';
+        item.innerHTML = `
+            <div class="input-row">
+                <input type="text" class="jobTitle" placeholder="Job Title">
+                <input type="text" class="company" placeholder="Company">
+            </div>
+            <div class="input-row">
+                <input type="text" class="startDate" placeholder="Start Date">
+                <input type="text" class="endDate" placeholder="End Date">
+            </div>
+            <textarea class="jobDescription" placeholder="Job description and achievements..." rows="3"></textarea>
+            <button type="button" class="remove-btn" onclick="removeExperience(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(item);
+        this.updateExperienceListeners();
+    }
+
+    updateExperienceListeners() {
+        const items = document.querySelectorAll('.experience-item');
+        items.forEach(item => {
+            const inputs = item.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.removeEventListener('input', this.updateExperienceData.bind(this));
+                input.addEventListener('input', this.updateExperienceData.bind(this));
+            });
+        });
+    }
+
+    updateExperienceData() {
+        const items = document.querySelectorAll('.experience-item');
+        this.resumeData.experience = Array.from(items).map(item => ({
+            jobTitle: item.querySelector('.jobTitle').value,
+            company: item.querySelector('.company').value,
+            startDate: item.querySelector('.startDate').value,
+            endDate: item.querySelector('.endDate').value,
+            description: item.querySelector('.jobDescription').value
+        }));
+        this.updatePreview();
+    }
+
+    // Education functionality
+    addEducationItem() {
+        const container = document.getElementById('educationContainer');
+        const item = document.createElement('div');
+        item.className = 'education-item';
+        item.innerHTML = `
+            <div class="input-row">
+                <input type="text" class="degree" placeholder="Degree">
+                <input type="text" class="school" placeholder="School/University">
+            </div>
+            <div class="input-row">
+                <input type="text" class="gradYear" placeholder="Graduation Year">
+                <input type="text" class="gpa" placeholder="GPA (optional)">
+            </div>
+            <button type="button" class="remove-btn" onclick="removeEducation(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(item);
+        this.updateEducationListeners();
+    }
+
+    updateEducationListeners() {
+        const items = document.querySelectorAll('.education-item');
+        items.forEach(item => {
+            const inputs = item.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.removeEventListener('input', this.updateEducationData.bind(this));
+                input.addEventListener('input', this.updateEducationData.bind(this));
+            });
+        });
+    }
+
+    updateEducationData() {
+        const items = document.querySelectorAll('.education-item');
+        this.resumeData.education = Array.from(items).map(item => ({
+            degree: item.querySelector('.degree').value,
+            school: item.querySelector('.school').value,
+            gradYear: item.querySelector('.gradYear').value,
+            gpa: item.querySelector('.gpa').value
+        }));
+        this.updatePreview();
+    }
+
+    // Skills functionality
+    addSkillItem() {
+        const container = document.getElementById('skillsContainer');
+        const item = document.createElement('div');
+        item.className = 'skill-item';
+        item.innerHTML = `
+            <input type="text" class="skillName" placeholder="Skill name">
+            <select class="skillLevel">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+                <option value="Expert">Expert</option>
+            </select>
+            <button type="button" class="remove-btn" onclick="removeSkill(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(item);
+        this.updateSkillListeners();
+    }
+
+    updateSkillListeners() {
+        const items = document.querySelectorAll('.skill-item');
+        items.forEach(item => {
+            const inputs = item.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.removeEventListener('input', this.updateSkillData.bind(this));
+                input.removeEventListener('change', this.updateSkillData.bind(this));
+                input.addEventListener('input', this.updateSkillData.bind(this));
+                input.addEventListener('change', this.updateSkillData.bind(this));
+            });
+        });
+    }
+
+    updateSkillData() {
+        const items = document.querySelectorAll('.skill-item');
+        this.resumeData.skills = Array.from(items).map(item => ({
+            name: item.querySelector('.skillName').value,
+            level: item.querySelector('.skillLevel').value
+        }));
+        this.updatePreview();
+    }
+
+    // Projects functionality
+    addProjectItem() {
+        const container = document.getElementById('projectsContainer');
+        const item = document.createElement('div');
+        item.className = 'project-item';
+        item.innerHTML = `
+            <input type="text" class="projectName" placeholder="Project Name">
+            <textarea class="projectDescription" placeholder="Project description..." rows="2"></textarea>
+            <input type="url" class="projectLink" placeholder="Project URL (optional)">
+            <button type="button" class="remove-btn" onclick="removeProject(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(item);
+        this.updateProjectListeners();
+    }
+
+    updateProjectListeners() {
+        const items = document.querySelectorAll('.project-item');
+        items.forEach(item => {
+            const inputs = item.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.removeEventListener('input', this.updateProjectData.bind(this));
+                input.addEventListener('input', this.updateProjectData.bind(this));
+            });
+        });
+    }
+
+    updateProjectData() {
+        const items = document.querySelectorAll('.project-item');
+        this.resumeData.projects = Array.from(items).map(item => ({
+            name: item.querySelector('.projectName').value,
+            description: item.querySelector('.projectDescription').value,
+            link: item.querySelector('.projectLink').value
+        }));
+        this.updatePreview();
+    }
     
-    addEducationItem() { console.log('Add education functionality not implemented'); }
-    updateEducationListeners() { console.log('Education listeners not implemented'); }
-    updateEducationData() { console.log('Education data update not implemented'); }
-    
-    addSkillItem() { console.log('Add skill functionality not implemented'); }
-    updateSkillListeners() { console.log('Skill listeners not implemented'); }
-    updateSkillData() { console.log('Skill data update not implemented'); }
-    
-    addProjectItem() { console.log('Add project functionality not implemented'); }
-    updateProjectListeners() { console.log('Project listeners not implemented'); }
-    updateProjectData() { console.log('Project data update not implemented'); }
-    
-    addCertificationItem() { console.log('Add certification functionality not implemented'); }
-    updateCertificationListeners() { console.log('Certification listeners not implemented'); }
-    updateCertificationData() { console.log('Certification data update not implemented'); }
-    
-    addLanguageItem() { console.log('Add language functionality not implemented'); }
-    updateLanguageListeners() { console.log('Language listeners not implemented'); }
-    updateLanguageData() { console.log('Language data update not implemented'); }
-    
-    addHobbyItem() { console.log('Add hobby functionality not implemented'); }
-    updateHobbyListeners() { console.log('Hobby listeners not implemented'); }
-    updateHobbyData() { console.log('Hobby data update not implemented'); }
+    // Certifications functionality
+    addCertificationItem() {
+        const container = document.getElementById('certificationsContainer');
+        const item = document.createElement('div');
+        item.className = 'certification-item';
+        item.innerHTML = `
+            <input type="text" class="certificationName" placeholder="Certification Name">
+            <button type="button" class="remove-btn" onclick="removeCertification(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(item);
+        this.updateCertificationListeners();
+    }
+
+    updateCertificationListeners() {
+        const items = document.querySelectorAll('.certification-item');
+        items.forEach(item => {
+            const input = item.querySelector('input');
+            input.removeEventListener('input', this.updateCertificationData.bind(this));
+            input.addEventListener('input', this.updateCertificationData.bind(this));
+        });
+    }
+
+    updateCertificationData() {
+        const items = document.querySelectorAll('.certification-item');
+        this.resumeData.certifications = Array.from(items).map(item => 
+            item.querySelector('.certificationName').value
+        ).filter(cert => cert.trim() !== '');
+        this.updatePreview();
+    }
+
+    // Languages functionality
+    addLanguageItem() {
+        const container = document.getElementById('languagesContainer');
+        const item = document.createElement('div');
+        item.className = 'language-item';
+        item.innerHTML = `
+            <input type="text" class="languageName" placeholder="Language & Proficiency">
+            <button type="button" class="remove-btn" onclick="removeLanguage(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(item);
+        this.updateLanguageListeners();
+    }
+
+    updateLanguageListeners() {
+        const items = document.querySelectorAll('.language-item');
+        items.forEach(item => {
+            const input = item.querySelector('input');
+            input.removeEventListener('input', this.updateLanguageData.bind(this));
+            input.addEventListener('input', this.updateLanguageData.bind(this));
+        });
+    }
+
+    updateLanguageData() {
+        const items = document.querySelectorAll('.language-item');
+        this.resumeData.languages = Array.from(items).map(item => 
+            item.querySelector('.languageName').value
+        ).filter(lang => lang.trim() !== '');
+        this.updatePreview();
+    }
+
+    // Hobbies functionality
+    addHobbyItem() {
+        const container = document.getElementById('hobbiesContainer');
+        const item = document.createElement('div');
+        item.className = 'hobby-item';
+        item.innerHTML = `
+            <input type="text" class="hobbyName" placeholder="Hobby or Interest">
+            <button type="button" class="remove-btn" onclick="removeHobby(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(item);
+        this.updateHobbyListeners();
+    }
+
+    updateHobbyListeners() {
+        const items = document.querySelectorAll('.hobby-item');
+        items.forEach(item => {
+            const input = item.querySelector('input');
+            input.removeEventListener('input', this.updateHobbyData.bind(this));
+            input.addEventListener('input', this.updateHobbyData.bind(this));
+        });
+    }
+
+    updateHobbyData() {
+        const items = document.querySelectorAll('.hobby-item');
+        this.resumeData.hobbies = Array.from(items).map(item => 
+            item.querySelector('.hobbyName').value
+        ).filter(hobby => hobby.trim() !== '');
+        this.updatePreview();
+    }
 }
 
 // Global functions for remove buttons
