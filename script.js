@@ -515,87 +515,25 @@ class ResumeBuilder {
     constructor() {
         this.resumeData = {
             personal: {
-                fullName: 'Diya Raghavendra',
-                title: 'Full Stack Developer',
-                email: 'diya.drap@gmail.com',
-                phone: '6363251508',
-                location: 'Bangalore, India'
+                fullName: '',
+                title: '',
+                email: '',
+                phone: '',
+                location: ''
             },
-            summary: 'Highly motivated Full Stack Developer with hands-on experience in designing, developing, and deploying scalable web applications. Skilled in modern frontend and backend technologies, RESTful APIs, and database design. Passionate about clean code, performance optimization, and building user-centric digital experiences.',
-            experience: [
-                {
-                    jobTitle: 'Full Stack Developer',
-                    company: 'Tech Solutions Pvt. Ltd., Bangalore',
-                    startDate: '2023',
-                    endDate: 'Present',
-                    description: 'Developed responsive web applications using React, Node.js, and Express. Built and integrated REST APIs for frontend-backend communication. Implemented authentication and authorization using JWT. Improved application performance and UI responsiveness. Worked in Agile teams with designers and testers.'
-                },
-                {
-                    jobTitle: 'Web Developer Intern',
-                    company: 'Startup Hub, Bangalore',
-                    startDate: '2022',
-                    endDate: '2023',
-                    description: 'Built UI components using HTML, CSS, JavaScript, and React. Assisted in backend API development with Node.js. Managed databases using MongoDB. Participated in testing and deployment processes.'
-                }
-            ],
-            education: [
-                {
-                    degree: 'Bachelor of Engineering (B.E.) – Computer Science',
-                    school: 'XYZ Institute of Technology, Karnataka',
-                    gradYear: '2019 – 2023',
-                    gpa: 'CGPA: 8.4 / 10'
-                }
-            ],
-            skills: [
-                { name: 'HTML5', level: 'Expert' },
-                { name: 'CSS3', level: 'Expert' },
-                { name: 'JavaScript (ES6+)', level: 'Advanced' },
-                { name: 'React.js', level: 'Advanced' },
-                { name: 'Tailwind CSS', level: 'Advanced' },
-                { name: 'Bootstrap', level: 'Advanced' },
-                { name: 'Node.js', level: 'Advanced' },
-                { name: 'Express.js', level: 'Advanced' },
-                { name: 'REST APIs', level: 'Advanced' },
-                { name: 'MongoDB', level: 'Intermediate' },
-                { name: 'MySQL', level: 'Intermediate' },
-                { name: 'Git', level: 'Advanced' },
-                { name: 'GitHub', level: 'Advanced' },
-                { name: 'VS Code', level: 'Expert' },
-                { name: 'Postman', level: 'Advanced' },
-                { name: 'Docker', level: 'Beginner' }
-            ],
-            projects: [
-                {
-                    name: 'Resume Builder Web Application',
-                    description: 'Developed a web-based resume builder with live preview. Implemented PDF download functionality. Built modern responsive UI using React and Tailwind CSS.',
-                    link: ''
-                },
-                {
-                    name: 'E-Commerce Web Application',
-                    description: 'Full-stack app with user authentication and product management. Integrated shopping cart and checkout features. Built using React, Node.js, MongoDB.',
-                    link: ''
-                }
-            ],
+            summary: '',
+            experience: [],
+            education: [],
+            skills: [],
+            projects: [],
             social: {
-                github: 'https://github.com/diya-raghavendra',
-                linkedin: 'https://linkedin.com/in/diya-raghavendra',
-                portfolio: 'https://diya.dev'
+                github: '',
+                linkedin: '',
+                portfolio: ''
             },
-            certifications: [
-                'Full Stack Web Development – Udemy',
-                'JavaScript Algorithms and Data Structures – freeCodeCamp'
-            ],
-            languages: [
-                'English (Fluent)',
-                'Kannada (Native)',
-                'Hindi (Conversational)'
-            ],
-            hobbies: [
-                'Coding personal projects',
-                'UI/UX design',
-                'Tech blogging',
-                'Problem-solving'
-            ]
+            certifications: [],
+            languages: [],
+            hobbies: []
         };
         
         this.currentTemplate = 'minimal';
@@ -821,6 +759,53 @@ class ResumeBuilder {
         document.getElementById('linkedin').value = this.resumeData.social.linkedin || '';
         document.getElementById('github').value = this.resumeData.social.github || '';
         document.getElementById('portfolio').value = this.resumeData.social.portfolio || '';
+        
+        // Clear all dynamic sections - they should start empty
+        this.clearDynamicSections();
+    }
+    
+    clearDynamicSections() {
+        // Clear experience container
+        const experienceContainer = document.getElementById('experienceContainer');
+        if (experienceContainer) {
+            experienceContainer.innerHTML = '';
+        }
+        
+        // Clear education container
+        const educationContainer = document.getElementById('educationContainer');
+        if (educationContainer) {
+            educationContainer.innerHTML = '';
+        }
+        
+        // Clear skills container
+        const skillsContainer = document.getElementById('skillsContainer');
+        if (skillsContainer) {
+            skillsContainer.innerHTML = '';
+        }
+        
+        // Clear projects container
+        const projectsContainer = document.getElementById('projectsContainer');
+        if (projectsContainer) {
+            projectsContainer.innerHTML = '';
+        }
+        
+        // Clear certifications container
+        const certificationsContainer = document.getElementById('certificationsContainer');
+        if (certificationsContainer) {
+            certificationsContainer.innerHTML = '';
+        }
+        
+        // Clear languages container
+        const languagesContainer = document.getElementById('languagesContainer');
+        if (languagesContainer) {
+            languagesContainer.innerHTML = '';
+        }
+        
+        // Clear hobbies container
+        const hobbiesContainer = document.getElementById('hobbiesContainer');
+        if (hobbiesContainer) {
+            hobbiesContainer.innerHTML = '';
+        }
     }
 
     generateHeader() {
@@ -1425,13 +1410,15 @@ class ResumeBuilder {
 
     updateExperienceData() {
         const items = document.querySelectorAll('.experience-item');
-        this.resumeData.experience = Array.from(items).map(item => ({
-            jobTitle: item.querySelector('.jobTitle').value,
-            company: item.querySelector('.company').value,
-            startDate: item.querySelector('.startDate').value,
-            endDate: item.querySelector('.endDate').value,
-            description: item.querySelector('.jobDescription').value
-        }));
+        this.resumeData.experience = Array.from(items)
+            .map(item => ({
+                jobTitle: item.querySelector('.jobTitle')?.value || '',
+                company: item.querySelector('.company')?.value || '',
+                startDate: item.querySelector('.startDate')?.value || '',
+                endDate: item.querySelector('.endDate')?.value || '',
+                description: item.querySelector('.jobDescription')?.value || ''
+            }))
+            .filter(exp => exp.jobTitle || exp.company || exp.description);
         this.updatePreview();
     }
 
@@ -1470,12 +1457,14 @@ class ResumeBuilder {
 
     updateEducationData() {
         const items = document.querySelectorAll('.education-item');
-        this.resumeData.education = Array.from(items).map(item => ({
-            degree: item.querySelector('.degree').value,
-            school: item.querySelector('.school').value,
-            gradYear: item.querySelector('.gradYear').value,
-            gpa: item.querySelector('.gpa').value
-        }));
+        this.resumeData.education = Array.from(items)
+            .map(item => ({
+                degree: item.querySelector('.degree')?.value || '',
+                school: item.querySelector('.school')?.value || '',
+                gradYear: item.querySelector('.gradYear')?.value || '',
+                gpa: item.querySelector('.gpa')?.value || ''
+            }))
+            .filter(edu => edu.degree || edu.school);
         this.updatePreview();
     }
 
@@ -1515,10 +1504,12 @@ class ResumeBuilder {
 
     updateSkillData() {
         const items = document.querySelectorAll('.skill-item');
-        this.resumeData.skills = Array.from(items).map(item => ({
-            name: item.querySelector('.skillName').value,
-            level: item.querySelector('.skillLevel').value
-        }));
+        this.resumeData.skills = Array.from(items)
+            .map(item => ({
+                name: item.querySelector('.skillName')?.value || '',
+                level: item.querySelector('.skillLevel')?.value || 'Beginner'
+            }))
+            .filter(skill => skill.name.trim() !== '');
         this.updatePreview();
     }
 
@@ -1552,11 +1543,13 @@ class ResumeBuilder {
 
     updateProjectData() {
         const items = document.querySelectorAll('.project-item');
-        this.resumeData.projects = Array.from(items).map(item => ({
-            name: item.querySelector('.projectName').value,
-            description: item.querySelector('.projectDescription').value,
-            link: item.querySelector('.projectLink').value
-        }));
+        this.resumeData.projects = Array.from(items)
+            .map(item => ({
+                name: item.querySelector('.projectName')?.value || '',
+                description: item.querySelector('.projectDescription')?.value || '',
+                link: item.querySelector('.projectLink')?.value || ''
+            }))
+            .filter(project => project.name.trim() !== '' || project.description.trim() !== '');
         this.updatePreview();
     }
     

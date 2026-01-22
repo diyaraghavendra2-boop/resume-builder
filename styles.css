@@ -364,6 +364,30 @@ textarea {
     position: relative;
 }
 
+#experienceContainer:empty::before,
+#educationContainer:empty::before,
+#skillsContainer:empty::before,
+#projectsContainer:empty::before,
+#certificationsContainer:empty::before,
+#languagesContainer:empty::before,
+#hobbiesContainer:empty::before {
+    content: "No items added yet. Click 'Add' to get started.";
+    display: block;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-style: italic;
+    padding: 2rem;
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    border: 2px dashed var(--border-color);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.add-btn {
+    margin-top: 0.5rem;
+}
+
 .certification-item, .language-item, .hobby-item {
     display: grid;
     grid-template-columns: 1fr auto;
