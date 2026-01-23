@@ -1,565 +1,234 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+    <title>Resume Builder</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Resume Builder</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body { 
             font-family: Arial, sans-serif; 
-            background: #f5f5f5; 
-            color: #333; 
-            line-height: 1.6; 
-            padding: 20px;
+            margin: 20px; 
+            background: #f0f0f0; 
         }
-        
-        .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-        }
-        
         .header { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            background: #4a90e2; 
             color: white; 
             padding: 20px; 
-            border-radius: 10px; 
+            text-align: center; 
             margin-bottom: 20px; 
-            text-align: center;
         }
-        
-        .header h1 { 
-            font-size: 28px; 
-            margin-bottom: 10px; 
-        }
-        
-        .buttons { 
+        .container { 
             display: flex; 
-            gap: 10px; 
-            justify-content: center; 
-            flex-wrap: wrap;
-        }
-        
-        .btn { 
-            background: rgba(255,255,255,0.2); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.3); 
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            font-size: 14px;
-        }
-        
-        .btn:hover { 
-            background: rgba(255,255,255,0.3); 
-        }
-        
-        .content { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
             gap: 20px; 
         }
-        
-        .panel { 
+        .editor, .preview { 
+            flex: 1; 
             background: white; 
             padding: 20px; 
-            border-radius: 10px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            border-radius: 5px; 
         }
-        
-        .panel h2 { 
-            color: #667eea; 
-            margin-bottom: 20px; 
-            border-bottom: 2px solid #667eea; 
-            padding-bottom: 10px;
-        }
-        
-        .form-group { 
-            margin-bottom: 15px; 
-        }
-        
-        .form-group label { 
-            display: block; 
-            margin-bottom: 5px; 
-            font-weight: bold; 
-            color: #555;
-        }
-        
-        .form-group input, 
-        .form-group textarea { 
+        input, textarea { 
             width: 100%; 
-            padding: 10px; 
+            padding: 8px; 
+            margin: 5px 0; 
             border: 1px solid #ddd; 
-            border-radius: 5px; 
-            font-family: inherit; 
-            font-size: 14px;
+            border-radius: 3px; 
         }
-        
-        .form-group input:focus, 
-        .form-group textarea:focus { 
-            outline: none; 
-            border-color: #667eea; 
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
-        }
-        
-        .form-row { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-        }
-        
-        .resume-header { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        button { 
+            background: #4a90e2; 
             color: white; 
-            padding: 20px; 
-            border-radius: 10px; 
-            text-align: center; 
-            margin-bottom: 20px;
-        }
-        
-        .resume-header h1 { 
-            font-size: 24px; 
-            margin-bottom: 5px; 
-        }
-        
-        .resume-header h2 { 
-            font-size: 16px; 
-            margin-bottom: 10px; 
-            opacity: 0.9;
-        }
-        
-        .contact-info { 
-            font-size: 14px; 
-            opacity: 0.8;
-        }
-        
-        .section { 
-            margin-bottom: 20px; 
-        }
-        
-        .section h3 { 
-            color: #667eea; 
-            border-bottom: 2px solid #667eea; 
-            padding-bottom: 5px; 
-            margin-bottom: 10px; 
-            font-size: 16px;
-        }
-        
-        .skills-container, 
-        .hobbies-container { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 8px; 
-        }
-        
-        .skill-tag { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
-            padding: 5px 12px; 
-            border-radius: 15px; 
-            font-size: 12px; 
-            font-weight: bold;
-        }
-        
-        .hobby-tag { 
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-            color: white; 
-            padding: 5px 12px; 
-            border-radius: 15px; 
-            font-size: 12px; 
-            font-weight: bold;
-        }
-        
-        .entry { 
-            margin-bottom: 15px; 
-            padding-bottom: 10px; 
-            border-bottom: 1px solid #eee;
-        }
-        
-        .entry:last-child { 
-            border-bottom: none; 
-        }
-        
-        .entry-title { 
-            font-weight: bold; 
-            color: #667eea; 
-            font-size: 14px;
-        }
-        
-        .entry-company { 
-            color: #764ba2; 
-            font-weight: bold; 
-            font-size: 13px;
-        }
-        
-        .entry-date { 
-            color: #666; 
-            font-size: 12px; 
-            float: right;
-        }
-        
-        .entry-description { 
-            color: #555; 
-            font-size: 13px; 
-            margin-top: 5px;
-        }
-        
-        .add-btn { 
-            background: #667eea; 
-            color: white; 
+            padding: 10px 15px; 
             border: none; 
-            padding: 10px 20px; 
-            border-radius: 5px; 
+            border-radius: 3px; 
             cursor: pointer; 
-            width: 100%; 
-            margin-top: 10px;
+            margin: 5px; 
         }
-        
-        .add-btn:hover { 
-            background: #5a6fd8; 
+        .resume-header { 
+            background: #4a90e2; 
+            color: white; 
+            padding: 15px; 
+            text-align: center; 
+            margin-bottom: 15px; 
         }
-        
-        .profile-preview img { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 2px solid #667eea; 
-            margin-top: 10px;
+        .section { 
+            margin-bottom: 15px; 
         }
-        
+        .section h3 { 
+            color: #4a90e2; 
+            border-bottom: 1px solid #4a90e2; 
+        }
         @media (max-width: 768px) {
-            .content { 
-                grid-template-columns: 1fr; 
-            }
-            .form-row { 
-                grid-template-columns: 1fr; 
-            }
-            .buttons { 
+            .container { 
                 flex-direction: column; 
-                align-items: center;
             }
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>Resume Builder</h1>
+        <button onclick="save()">Save</button>
+        <button onclick="exportData()">Export</button>
+        <button onclick="print()">Print</button>
+    </div>
+
     <div class="container">
-        <div class="header">
-            <h1>Professional Resume Builder</h1>
-            <div class="buttons">
-                <button class="btn" onclick="saveResume()">💾 Save</button>
-                <button class="btn" onclick="exportResume()">📤 Export JSON</button>
-                <button class="btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
-                <button class="btn" onclick="printResume()">🖨️ Print PDF</button>
-                <button class="btn" onclick="resetResume()">🔄 Reset</button>
-            </div>
-            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importResume(event)">
+        <div class="editor">
+            <h2>Edit Resume</h2>
+            
+            <label>Name:</label>
+            <input type="text" id="name" placeholder="Your Name" onkeyup="update()">
+            
+            <label>Job Title:</label>
+            <input type="text" id="job" placeholder="Your Job Title" onkeyup="update()">
+            
+            <label>Email:</label>
+            <input type="email" id="email" placeholder="your@email.com" onkeyup="update()">
+            
+            <label>Phone:</label>
+            <input type="tel" id="phone" placeholder="(555) 123-4567" onkeyup="update()">
+            
+            <label>Location:</label>
+            <input type="text" id="location" placeholder="City, State" onkeyup="update()">
+            
+            <label>Summary:</label>
+            <textarea id="summary" rows="4" placeholder="Professional summary..." onkeyup="update()"></textarea>
+            
+            <label>Skills (comma separated):</label>
+            <textarea id="skills" rows="3" placeholder="JavaScript, React, Python..." onkeyup="update()"></textarea>
+            
+            <label>Experience:</label>
+            <textarea id="experience" rows="5" placeholder="Job Title - Company (Year-Year)&#10;Description of your role..." onkeyup="update()"></textarea>
+            
+            <label>Education:</label>
+            <textarea id="education" rows="3" placeholder="Degree - University (Year)" onkeyup="update()"></textarea>
         </div>
 
-        <div class="content">
-            <div class="panel">
-                <h2>✏️ Edit Resume</h2>
-                
-                <div class="form-group">
-                    <label>📷 Profile Picture:</label>
-                    <input type="file" id="profilePicture" accept="image/*" onchange="handleProfilePicture(event)">
-                    <div id="profilePreview" class="profile-preview"></div>
+        <div class="preview">
+            <h2>Preview</h2>
+            <div id="resume">
+                <div class="resume-header">
+                    <h1 id="p-name">Your Name</h1>
+                    <h3 id="p-job">Your Job Title</h3>
+                    <p id="p-contact">your@email.com | (555) 123-4567 | City, State</p>
                 </div>
-                
-                <div class="form-group">
-                    <label>👤 Full Name:</label>
-                    <input type="text" id="name" placeholder="Your Name" onchange="updateResume()">
-                </div>
-                
-                <div class="form-group">
-                    <label>💼 Job Title:</label>
-                    <input type="text" id="role" placeholder="Your Job Title" onchange="updateResume()">
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>📧 Email:</label>
-                        <input type="email" id="email" placeholder="your@email.com" onchange="updateResume()">
-                    </div>
-                    <div class="form-group">
-                        <label>📱 Phone:</label>
-                        <input type="tel" id="phone" placeholder="(555) 123-4567" onchange="updateResume()">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>📍 Location:</label>
-                        <input type="text" id="location" placeholder="City, State" onchange="updateResume()">
-                    </div>
-                    <div class="form-group">
-                        <label>🔗 LinkedIn:</label>
-                        <input type="text" id="linkedin" placeholder="linkedin.com/in/yourname" onchange="updateResume()">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>🌐 Website:</label>
-                    <input type="text" id="website" placeholder="yourwebsite.com" onchange="updateResume()">
-                </div>
-                
-                <div class="form-group">
-                    <label>📝 Professional Summary:</label>
-                    <textarea id="summary" rows="4" placeholder="Write your professional summary..." onchange="updateResume()"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>🛠️ Skills (comma separated):</label>
-                    <textarea id="skills" rows="3" placeholder="JavaScript, React, Node.js..." onchange="updateResume()"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎯 Hobbies (comma separated):</label>
-                    <textarea id="hobbies" rows="2" placeholder="Reading, Photography, Hiking..." onchange="updateResume()"></textarea>
-                </div>
-            </div>
 
-            <div class="panel">
-                <h2>👁️ Resume Preview</h2>
-                <div id="resume-preview">
-                    <div class="resume-header">
-                        <div id="profile-image-container"></div>
-                        <h1 id="preview-name">Your Name</h1>
-                        <h2 id="preview-role">Your Job Title</h2>
-                        <div class="contact-info">
-                            <span id="preview-email">your@email.com</span> | 
-                            <span id="preview-phone">(555) 123-4567</span> | 
-                            <span id="preview-location">City, State</span>
-                        </div>
-                        <div class="contact-info">
-                            <span id="preview-linkedin">linkedin.com/in/yourname</span> | 
-                            <span id="preview-website">yourwebsite.com</span>
-                        </div>
-                    </div>
+                <div class="section">
+                    <h3>Summary</h3>
+                    <p id="p-summary">Your professional summary will appear here...</p>
+                </div>
 
-                    <div class="section">
-                        <h3>📝 Professional Summary</h3>
-                        <p id="preview-summary">Your professional summary will appear here...</p>
-                    </div>
+                <div class="section">
+                    <h3>Skills</h3>
+                    <p id="p-skills">Your skills will appear here...</p>
+                </div>
 
-                    <div class="section">
-                        <h3>🛠️ Skills</h3>
-                        <div id="preview-skills" class="skills-container">
-                            <span class="skill-tag">Your skills will appear here</span>
-                        </div>
-                    </div>
+                <div class="section">
+                    <h3>Experience</h3>
+                    <div id="p-experience">Your experience will appear here...</div>
+                </div>
 
-                    <div class="section">
-                        <h3>🎯 Hobbies & Interests</h3>
-                        <div id="preview-hobbies" class="hobbies-container">
-                            <span class="hobby-tag">Your hobbies will appear here</span>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h3>💼 Experience</h3>
-                        <div id="preview-experience">
-                            <div class="entry">
-                                <div class="entry-title">Add your work experience</div>
-                                <div class="entry-company">Company Name</div>
-                                <div class="entry-date">2020 - Present</div>
-                                <div class="entry-description">Describe your role and achievements...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h3>🎓 Education</h3>
-                        <div id="preview-education">
-                            <div class="entry">
-                                <div class="entry-title">Your Degree</div>
-                                <div class="entry-company">University Name</div>
-                                <div class="entry-date">2020</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="section">
+                    <h3>Education</h3>
+                    <div id="p-education">Your education will appear here...</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Simple resume data
-        let resumeData = {
+        // Simple data object
+        var data = {
             name: '',
-            role: '',
+            job: '',
             email: '',
             phone: '',
             location: '',
-            linkedin: '',
-            website: '',
             summary: '',
             skills: '',
-            hobbies: '',
-            profilePicture: ''
+            experience: '',
+            education: ''
         };
 
         // Load saved data
         function loadData() {
             try {
-                const saved = localStorage.getItem('simpleResumeData');
+                var saved = localStorage.getItem('resumeData');
                 if (saved) {
-                    resumeData = JSON.parse(saved);
-                    populateForm();
+                    data = JSON.parse(saved);
+                    document.getElementById('name').value = data.name || '';
+                    document.getElementById('job').value = data.job || '';
+                    document.getElementById('email').value = data.email || '';
+                    document.getElementById('phone').value = data.phone || '';
+                    document.getElementById('location').value = data.location || '';
+                    document.getElementById('summary').value = data.summary || '';
+                    document.getElementById('skills').value = data.skills || '';
+                    document.getElementById('experience').value = data.experience || '';
+                    document.getElementById('education').value = data.education || '';
                 }
             } catch (e) {
-                console.log('No saved data found');
+                console.log('No saved data');
             }
+            update();
+        }
+
+        // Update preview
+        function update() {
+            data.name = document.getElementById('name').value;
+            data.job = document.getElementById('job').value;
+            data.email = document.getElementById('email').value;
+            data.phone = document.getElementById('phone').value;
+            data.location = document.getElementById('location').value;
+            data.summary = document.getElementById('summary').value;
+            data.skills = document.getElementById('skills').value;
+            data.experience = document.getElementById('experience').value;
+            data.education = document.getElementById('education').value;
+
+            document.getElementById('p-name').textContent = data.name || 'Your Name';
+            document.getElementById('p-job').textContent = data.job || 'Your Job Title';
+            document.getElementById('p-contact').textContent = (data.email || 'your@email.com') + ' | ' + (data.phone || '(555) 123-4567') + ' | ' + (data.location || 'City, State');
+            document.getElementById('p-summary').textContent = data.summary || 'Your professional summary will appear here...';
+            document.getElementById('p-skills').textContent = data.skills || 'Your skills will appear here...';
+            document.getElementById('p-experience').innerHTML = (data.experience || 'Your experience will appear here...').replace(/\n/g, '<br>');
+            document.getElementById('p-education').innerHTML = (data.education || 'Your education will appear here...').replace(/\n/g, '<br>');
         }
 
         // Save data
-        function saveData() {
+        function save() {
             try {
-                localStorage.setItem('simpleResumeData', JSON.stringify(resumeData));
+                localStorage.setItem('resumeData', JSON.stringify(data));
+                alert('Resume saved!');
             } catch (e) {
-                console.log('Error saving data');
+                alert('Error saving resume');
             }
         }
 
-        // Populate form
-        function populateForm() {
-            document.getElementById('name').value = resumeData.name || '';
-            document.getElementById('role').value = resumeData.role || '';
-            document.getElementById('email').value = resumeData.email || '';
-            document.getElementById('phone').value = resumeData.phone || '';
-            document.getElementById('location').value = resumeData.location || '';
-            document.getElementById('linkedin').value = resumeData.linkedin || '';
-            document.getElementById('website').value = resumeData.website || '';
-            document.getElementById('summary').value = resumeData.summary || '';
-            document.getElementById('skills').value = resumeData.skills || '';
-            document.getElementById('hobbies').value = resumeData.hobbies || '';
-            
-            if (resumeData.profilePicture) {
-                document.getElementById('profilePreview').innerHTML = `<img src="${resumeData.profilePicture}" alt="Profile">`;
-                document.getElementById('profile-image-container').innerHTML = `<img src="${resumeData.profilePicture}" alt="Profile" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.3); margin-bottom: 10px;">`;
+        // Export data
+        function exportData() {
+            try {
+                var dataStr = JSON.stringify(data, null, 2);
+                var dataBlob = new Blob([dataStr], {type: 'application/json'});
+                var url = URL.createObjectURL(dataBlob);
+                var link = document.createElement('a');
+                link.href = url;
+                link.download = 'resume.json';
+                link.click();
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                alert('Error exporting resume');
             }
-        }
-
-        // Update resume preview
-        function updateResume() {
-            // Get form values
-            resumeData.name = document.getElementById('name').value;
-            resumeData.role = document.getElementById('role').value;
-            resumeData.email = document.getElementById('email').value;
-            resumeData.phone = document.getElementById('phone').value;
-            resumeData.location = document.getElementById('location').value;
-            resumeData.linkedin = document.getElementById('linkedin').value;
-            resumeData.website = document.getElementById('website').value;
-            resumeData.summary = document.getElementById('summary').value;
-            resumeData.skills = document.getElementById('skills').value;
-            resumeData.hobbies = document.getElementById('hobbies').value;
-
-            // Update preview
-            document.getElementById('preview-name').textContent = resumeData.name || 'Your Name';
-            document.getElementById('preview-role').textContent = resumeData.role || 'Your Job Title';
-            document.getElementById('preview-email').textContent = resumeData.email || 'your@email.com';
-            document.getElementById('preview-phone').textContent = resumeData.phone || '(555) 123-4567';
-            document.getElementById('preview-location').textContent = resumeData.location || 'City, State';
-            document.getElementById('preview-linkedin').textContent = resumeData.linkedin || 'linkedin.com/in/yourname';
-            document.getElementById('preview-website').textContent = resumeData.website || 'yourwebsite.com';
-            document.getElementById('preview-summary').textContent = resumeData.summary || 'Your professional summary will appear here...';
-
-            // Update skills
-            const skillsContainer = document.getElementById('preview-skills');
-            if (resumeData.skills.trim()) {
-                const skillsArray = resumeData.skills.split(',').map(s => s.trim()).filter(s => s);
-                skillsContainer.innerHTML = skillsArray.map(skill => `<span class="skill-tag">${skill}</span>`).join('');
-            } else {
-                skillsContainer.innerHTML = '<span class="skill-tag">Your skills will appear here</span>';
-            }
-
-            // Update hobbies
-            const hobbiesContainer = document.getElementById('preview-hobbies');
-            if (resumeData.hobbies.trim()) {
-                const hobbiesArray = resumeData.hobbies.split(',').map(s => s.trim()).filter(s => s);
-                hobbiesContainer.innerHTML = hobbiesArray.map(hobby => `<span class="hobby-tag">${hobby}</span>`).join('');
-            } else {
-                hobbiesContainer.innerHTML = '<span class="hobby-tag">Your hobbies will appear here</span>';
-            }
-
-            // Auto-save
-            saveData();
-        }
-
-        // Handle profile picture
-        function handleProfilePicture(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                resumeData.profilePicture = e.target.result;
-                document.getElementById('profilePreview').innerHTML = `<img src="${e.target.result}" alt="Profile">`;
-                document.getElementById('profile-image-container').innerHTML = `<img src="${e.target.result}" alt="Profile" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.3); margin-bottom: 10px;">`;
-                saveData();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Save resume
-        function saveResume() {
-            updateResume();
-            alert('✅ Resume saved successfully!');
-        }
-
-        // Export resume
-        function exportResume() {
-            updateResume();
-            const dataStr = JSON.stringify(resumeData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `resume-${resumeData.name.replace(/\s+/g, '-').toLowerCase() || 'export'}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // Import resume
-        function importResume(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    resumeData = JSON.parse(e.target.result);
-                    populateForm();
-                    updateResume();
-                    alert('✅ Resume imported successfully!');
-                } catch (error) {
-                    alert('❌ Error importing resume. Please check the file format.');
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
         }
 
         // Print resume
-        function printResume() {
+        function print() {
             window.print();
         }
 
-        // Reset resume
-        function resetResume() {
-            if (confirm('Are you sure you want to reset your resume? This will delete all your data.')) {
-                localStorage.removeItem('simpleResumeData');
-                location.reload();
-            }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        // Initialize when page loads
+        window.onload = function() {
             loadData();
-            updateResume();
-            console.log('✅ Resume builder loaded successfully!');
-        });
+            console.log('Resume builder loaded');
+        };
     </script>
 </body>
 </html>
