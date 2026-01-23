@@ -1,0 +1,62 @@
+{
+  "header": {
+    "name": "John Doe",
+    "role": "Software Developer",
+    "email": "john.doe@email.com",
+    "phone": "(555) 123-4567",
+    "location": "City, State",
+    "linkedin": "linkedin.com/in/johndoe",
+    "website": "johndoe.dev",
+    "profilePicture": ""
+  },
+  "professionalSummary": "Experienced software developer with 5+ years of expertise in full-stack development. Passionate about creating efficient, scalable solutions and collaborating with cross-functional teams to deliver high-quality products.",
+  "skills": [
+    "JavaScript",
+    "React",
+    "Node.js",
+    "Python",
+    "SQL",
+    "Git",
+    "AWS",
+    "Docker"
+  ],
+  "experience": [
+    {
+      "title": "Senior Software Developer",
+      "company": "Tech Company Inc.",
+      "location": "City, State",
+      "startDate": "2021",
+      "endDate": "Present",
+      "description": "Lead development of web applications using React and Node.js. Collaborated with product teams to implement new features and improve user experience."
+    },
+    {
+      "title": "Software Developer",
+      "company": "StartUp Solutions",
+      "location": "City, State",
+      "startDate": "2019",
+      "endDate": "2021",
+      "description": "Developed and maintained multiple client projects using modern web technologies. Participated in code reviews and mentored junior developers."
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Certified Developer",
+      "issuer": "Amazon Web Services",
+      "date": "2023"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Science in Computer Science",
+      "school": "University Name",
+      "location": "City, State",
+      "year": "2019"
+    }
+  ],
+  "hobbies": [
+    "Reading",
+    "Photography",
+    "Hiking",
+    "Coding"
+  ]
+}
