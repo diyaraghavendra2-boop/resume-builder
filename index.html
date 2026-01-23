@@ -7,7 +7,462 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .app-header h1 {
+            color: white;
+            font-weight: 600;
+            font-size: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Editor Panel */
+        .editor-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            border-left: 6px solid #6366f1;
+        }
+
+        .editor-section {
+            margin-bottom: 32px;
+        }
+
+        .editor-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .editor-section h3 {
+            color: #6366f1;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #6366f1;
+            position: relative;
+        }
+
+        .editor-section h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -3px;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Profile Picture */
+        .profile-preview {
+            margin-top: 10px;
+        }
+
+        .profile-preview img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #6366f1;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            border-right: 6px solid #6366f1;
+        }
+
+        .resume-preview {
+            background: white;
+            max-width: 100%;
+            margin: 0 auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Resume Header */
+        .resume-header {
+            padding: 24px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            color: white;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .profile-image-container {
+            flex-shrink: 0;
+        }
+
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header-text {
+            text-align: left;
+        }
+
+        .resume-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .resume-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 16px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .contact-info span {
+            position: relative;
+        }
+
+        .contact-info span:not(:last-child)::after {
+            content: '•';
+            position: absolute;
+            right: -10px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Resume Body */
+        .resume-body {
+            display: grid;
+            gap: 24px;
+        }
+
+        .resume-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #6366f1;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #6366f1;
+            position: relative;
+        }
+
+        .resume-section h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+            border-radius: 2px;
+        }
+
+        .resume-section p {
+            color: #475569;
+            margin-bottom: 12px;
+        }
+
+        /* Skills */
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            margin: 2px;
+            display: inline-block;
+        }
+
+        /* Hobbies */
+        .hobbies-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .hobby-tag {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            margin: 2px;
+            display: inline-block;
+        }
+
+        /* Experience & Education */
+        .experience-entry,
+        .education-entry {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .experience-entry:last-child,
+        .education-entry:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .entry-title {
+            font-weight: 600;
+            color: #6366f1;
+            font-size: 16px;
+        }
+
+        .entry-company {
+            color: #8b5cf6;
+            font-weight: 500;
+        }
+
+        .entry-location {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .entry-date {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .entry-description {
+            color: #475569;
+            margin-top: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-panel {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .app-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .header-actions {
+                justify-content: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .contact-info span::after {
+                display: none;
+            }
+            
+            .entry-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -84,13 +539,13 @@
                 <div class="editor-section">
                     <h3>Experience</h3>
                     <div id="experienceContainer"></div>
-                    <button type="button" class="btn btn-secondary add-btn" onclick="addExperience()">+ Add Experience</button>
+                    <button type="button" class="btn btn-secondary" onclick="addExperience()" style="width: 100%; margin-top: 12px;">+ Add Experience</button>
                 </div>
 
                 <div class="editor-section">
                     <h3>Certifications</h3>
                     <div id="certificationsContainer"></div>
-                    <button type="button" class="btn btn-secondary add-btn" onclick="addCertification()">+ Add Certification</button>
+                    <button type="button" class="btn btn-secondary" onclick="addCertification()" style="width: 100%; margin-top: 12px;">+ Add Certification</button>
                 </div>
 
                 <div class="editor-section">
@@ -103,7 +558,7 @@
                 <div class="editor-section">
                     <h3>Education</h3>
                     <div id="educationContainer"></div>
-                    <button type="button" class="btn btn-secondary add-btn" onclick="addEducation()">+ Add Education</button>
+                    <button type="button" class="btn btn-secondary" onclick="addEducation()" style="width: 100%; margin-top: 12px;">+ Add Education</button>
                 </div>
             </div>
 
@@ -167,6 +622,377 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Simple, bulletproof resume builder
+        let resumeData = {
+            header: {
+                name: "John Doe",
+                role: "Software Developer",
+                email: "john.doe@email.com",
+                phone: "(555) 123-4567",
+                location: "City, State",
+                linkedin: "linkedin.com/in/johndoe",
+                website: "johndoe.dev",
+                profilePicture: ""
+            },
+            professionalSummary: "Experienced software developer with 5+ years of expertise in full-stack development.",
+            skills: ["JavaScript", "React", "Node.js", "Python", "SQL", "Git", "AWS", "Docker"],
+            experience: [{
+                title: "Senior Software Developer",
+                company: "Tech Company Inc.",
+                location: "City, State",
+                startDate: "2021",
+                endDate: "Present",
+                description: "Lead development of web applications using React and Node.js."
+            }],
+            certifications: [{
+                name: "AWS Certified Developer",
+                issuer: "Amazon Web Services",
+                date: "2023"
+            }],
+            education: [{
+                degree: "Bachelor of Science in Computer Science",
+                school: "University Name",
+                location: "City, State",
+                year: "2019"
+            }],
+            hobbies: ["Reading", "Photography", "Hiking", "Coding"]
+        };
+
+        // Load saved data or use default
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('resumeData');
+                if (saved) {
+                    resumeData = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.log('Using default data');
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('resumeData', JSON.stringify(resumeData));
+            } catch (e) {
+                console.error('Error saving data');
+            }
+        }
+
+        // Update preview
+        function updatePreview() {
+            try {
+                // Update header
+                document.getElementById('previewName').textContent = resumeData.header.name || 'Your Name';
+                document.getElementById('previewRole').textContent = resumeData.header.role || 'Your Role';
+                document.getElementById('previewEmail').textContent = resumeData.header.email || '';
+                document.getElementById('previewPhone').textContent = resumeData.header.phone || '';
+                document.getElementById('previewLocation').textContent = resumeData.header.location || '';
+                document.getElementById('previewLinkedin').textContent = resumeData.header.linkedin || '';
+                document.getElementById('previewWebsite').textContent = resumeData.header.website || '';
+
+                // Update profile picture
+                const profileImg = document.getElementById('previewProfilePicture');
+                if (resumeData.header.profilePicture) {
+                    profileImg.src = resumeData.header.profilePicture;
+                    profileImg.style.display = 'block';
+                } else {
+                    profileImg.style.display = 'none';
+                }
+
+                // Update summary
+                document.getElementById('previewSummary').textContent = resumeData.professionalSummary || '';
+
+                // Update skills
+                const skillsContainer = document.getElementById('previewSkills');
+                skillsContainer.innerHTML = '';
+                resumeData.skills.forEach(skill => {
+                    const skillTag = document.createElement('span');
+                    skillTag.className = 'skill-tag';
+                    skillTag.textContent = skill;
+                    skillsContainer.appendChild(skillTag);
+                });
+
+                // Update hobbies
+                const hobbiesContainer = document.getElementById('previewHobbies');
+                hobbiesContainer.innerHTML = '';
+                resumeData.hobbies.forEach(hobby => {
+                    const hobbyTag = document.createElement('span');
+                    hobbyTag.className = 'hobby-tag';
+                    hobbyTag.textContent = hobby;
+                    hobbiesContainer.appendChild(hobbyTag);
+                });
+
+                // Update experience
+                const expContainer = document.getElementById('previewExperience');
+                expContainer.innerHTML = '';
+                resumeData.experience.forEach(exp => {
+                    const expDiv = document.createElement('div');
+                    expDiv.className = 'experience-entry';
+                    expDiv.innerHTML = `
+                        <div class="entry-header">
+                            <div>
+                                <div class="entry-title">${exp.title || ''}</div>
+                                <div class="entry-company">${exp.company || ''}</div>
+                                <div class="entry-location">${exp.location || ''}</div>
+                            </div>
+                            <div class="entry-date">${exp.startDate || ''} - ${exp.endDate || ''}</div>
+                        </div>
+                        <div class="entry-description">${exp.description || ''}</div>
+                    `;
+                    expContainer.appendChild(expDiv);
+                });
+
+                // Update certifications
+                const certContainer = document.getElementById('previewCertifications');
+                certContainer.innerHTML = '';
+                resumeData.certifications.forEach(cert => {
+                    const certDiv = document.createElement('div');
+                    certDiv.className = 'experience-entry';
+                    certDiv.innerHTML = `
+                        <div class="entry-header">
+                            <div>
+                                <div class="entry-title">${cert.name || ''}</div>
+                                <div class="entry-company">${cert.issuer || ''}</div>
+                            </div>
+                            <div class="entry-date">${cert.date || ''}</div>
+                        </div>
+                    `;
+                    certContainer.appendChild(certDiv);
+                });
+
+                // Update education
+                const eduContainer = document.getElementById('previewEducation');
+                eduContainer.innerHTML = '';
+                resumeData.education.forEach(edu => {
+                    const eduDiv = document.createElement('div');
+                    eduDiv.className = 'education-entry';
+                    eduDiv.innerHTML = `
+                        <div class="entry-header">
+                            <div>
+                                <div class="entry-title">${edu.degree || ''}</div>
+                                <div class="entry-company">${edu.school || ''}</div>
+                                <div class="entry-location">${edu.location || ''}</div>
+                            </div>
+                            <div class="entry-date">${edu.year || ''}</div>
+                        </div>
+                    `;
+                    eduContainer.appendChild(eduDiv);
+                });
+            } catch (e) {
+                console.error('Error updating preview:', e);
+            }
+        }
+
+        // Populate form fields
+        function populateForm() {
+            try {
+                document.getElementById('name').value = resumeData.header.name || '';
+                document.getElementById('role').value = resumeData.header.role || '';
+                document.getElementById('email').value = resumeData.header.email || '';
+                document.getElementById('phone').value = resumeData.header.phone || '';
+                document.getElementById('location').value = resumeData.header.location || '';
+                document.getElementById('linkedin').value = resumeData.header.linkedin || '';
+                document.getElementById('website').value = resumeData.header.website || '';
+                document.getElementById('professionalSummary').value = resumeData.professionalSummary || '';
+                document.getElementById('skills').value = resumeData.skills.join(', ');
+                document.getElementById('hobbies').value = resumeData.hobbies.join(', ');
+            } catch (e) {
+                console.error('Error populating form:', e);
+            }
+        }
+
+        // Add experience
+        function addExperience() {
+            resumeData.experience.push({
+                title: '',
+                company: '',
+                location: '',
+                startDate: '',
+                endDate: '',
+                description: ''
+            });
+            saveData();
+            updatePreview();
+        }
+
+        // Add certification
+        function addCertification() {
+            resumeData.certifications.push({
+                name: '',
+                issuer: '',
+                date: ''
+            });
+            saveData();
+            updatePreview();
+        }
+
+        // Add education
+        function addEducation() {
+            resumeData.education.push({
+                degree: '',
+                school: '',
+                location: '',
+                year: ''
+            });
+            saveData();
+            updatePreview();
+        }
+
+        // Export resume
+        function exportResume() {
+            try {
+                const dataStr = JSON.stringify(resumeData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `resume-${resumeData.header.name.replace(/\s+/g, '-').toLowerCase() || 'export'}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                alert('Error exporting resume');
+            }
+        }
+
+        // Import resume
+        function importResume(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    resumeData = importedData;
+                    saveData();
+                    populateForm();
+                    updatePreview();
+                    alert('Resume imported successfully!');
+                } catch (error) {
+                    alert('Error importing resume. Please check the file format.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // Print PDF
+        function printPDF() {
+            window.print();
+        }
+
+        // Save resume
+        function saveResume() {
+            saveData();
+            const saveBtn = document.getElementById('saveBtn');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = '✓ Saved!';
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+            }, 2000);
+        }
+
+        // Reset to default
+        function resetToDefault() {
+            if (confirm('Are you sure you want to reset to the default template?')) {
+                localStorage.removeItem('resumeData');
+                location.reload();
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            try {
+                // Header fields
+                ['name', 'role', 'email', 'phone', 'location', 'linkedin', 'website'].forEach(field => {
+                    const element = document.getElementById(field);
+                    if (element) {
+                        element.addEventListener('input', () => {
+                            resumeData.header[field] = element.value;
+                            saveData();
+                            updatePreview();
+                        });
+                    }
+                });
+
+                // Summary
+                const summaryElement = document.getElementById('professionalSummary');
+                if (summaryElement) {
+                    summaryElement.addEventListener('input', () => {
+                        resumeData.professionalSummary = summaryElement.value;
+                        saveData();
+                        updatePreview();
+                    });
+                }
+
+                // Skills
+                const skillsElement = document.getElementById('skills');
+                if (skillsElement) {
+                    skillsElement.addEventListener('input', () => {
+                        resumeData.skills = skillsElement.value.split(',').map(s => s.trim()).filter(s => s);
+                        saveData();
+                        updatePreview();
+                    });
+                }
+
+                // Hobbies
+                const hobbiesElement = document.getElementById('hobbies');
+                if (hobbiesElement) {
+                    hobbiesElement.addEventListener('input', () => {
+                        resumeData.hobbies = hobbiesElement.value.split(',').map(s => s.trim()).filter(s => s);
+                        saveData();
+                        updatePreview();
+                    });
+                }
+
+                // Profile picture
+                const profilePictureElement = document.getElementById('profilePicture');
+                if (profilePictureElement) {
+                    profilePictureElement.addEventListener('change', (event) => {
+                        const file = event.target.files[0];
+                        if (!file) return;
+
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const imageData = e.target.result;
+                            resumeData.header.profilePicture = imageData;
+                            saveData();
+                            
+                            // Show preview in editor
+                            const previewContainer = document.getElementById('profilePreview');
+                            previewContainer.innerHTML = `<img src="${imageData}" alt="Profile Picture">`;
+                            
+                            updatePreview();
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+
+                // Buttons
+                document.getElementById('saveBtn').addEventListener('click', saveResume);
+                document.getElementById('resetBtn').addEventListener('click', resetToDefault);
+                document.getElementById('exportBtn').addEventListener('click', exportResume);
+                document.getElementById('importFile').addEventListener('change', importResume);
+                document.getElementById('downloadPdfBtn').addEventListener('click', printPDF);
+            } catch (e) {
+                console.error('Error setting up event listeners:', e);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                loadData();
+                populateForm();
+                updatePreview();
+                setupEventListeners();
+                console.log('Resume builder loaded successfully');
+            } catch (e) {
+                console.error('Error initializing:', e);
+            }
+        });
+    </script>
 </body>
 </html>
