@@ -185,9 +185,11 @@
         </main>
     </div>
 
-    <script src="script.js"></script>
     <script src="config.js"></script>
-    <script src="script-simple-backend.js"></script>
-    <script src="resume-manager.js"></script>
+    <script src="script-with-backend.js"></script>
+    <script>
+        // Initialize the resume builder with backend authentication
+        const resumeBuilder = new ResumeBuilderWithBackend();
+    </script>
 </body>
 </html>
