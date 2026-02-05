@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder - Login/Register Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .auth-section {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .auth-form {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .auth-form h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+        .btn-logout {
+            background: #e53e3e;
+        }
+        .btn-logout:hover {
+            background: #c53030;
+        }
+        .message {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .user-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Resume Builder Authentication Test</h1>
+        
+        <div id="authForms" class="auth-section">
+            <div class="auth-form">
+                <h3>📝 Register New Account</h3>
+                <div class="form-group">
+                    <input type="text" id="regName" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="regEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="regPassword" placeholder="Password (min 6 chars)" required>
+                </div>
+                <button class="btn" onclick="register()">Register</button>
+            </div>
+            
+            <div class="auth-form">
+                <h3>🔐 Login to Account</h3>
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <button class="btn" onclick="login()">Login</button>
+            </div>
+        </div>
+        
+        <div id="userInfo" class="user-info hidden">
+            <h3>✅ Successfully Logged In!</h3>
+            <p><strong>Name:</strong> <span id="userName"></span></p>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <p><strong>Account Created:</strong> <span id="userCreated"></span></p>
+            <button class="btn btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+        
+        <div id="messages"></div>
+        
+        <div class="link">
+            <a href="index.html">← Back to Resume Builder</a>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // API Configuration
+        const API_BASE = window.RESUME_BUILDER_CONFIG ? window.RESUME_BUILDER_CONFIG.API_BASE : 'http://localhost:5001/api';
+        let currentUser = null;
+        let authToken = localStorage.getItem('authToken');
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (authToken) {
+                getCurrentUser();
+            }
+        });
+
+        async function register() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!name || !email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            try {
+                showMessage('Creating account...', 'info');
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    authToken = data.data.token;
+                    currentUser = data.data.user;
+                    localStorage.setItem('authToken', authToken);
+                    showMessage('✅ Registration successful!', 'success');
+                    showUserInfo();
+                    clearForms();
+                } else {
+                    showMessage(`❌ Registration failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`❌ Registration error: ${error.message}`, 'error');
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                showMessage('Logging in...', 'info');
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    authToken = data.data.token;
+                    currentUser = data.data.user;
+                    localStorage.setItem('authToken', authToken);
+                    showMessage('✅ Login successful!', 'success');
+                    showUserInfo();
+                    clearForms();
+                } else {
+                    showMessage(`❌ Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function getCurrentUser() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.data.user;
+                    showUserInfo();
+                } else {
+                    localStorage.removeItem('authToken');
+                    authToken = null;
+                }
+            } catch (error) {
+                console.error('Failed to get current user:', error);
+                localStorage.removeItem('authToken');
+                authToken = null;
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            showMessage('✅ Logged out successfully', 'success');
+            showAuthForms();
+        }
+
+        function showUserInfo() {
+            document.getElementById('authForms').classList.add('hidden');
+            document.getElementById('userInfo').classList.remove('hidden');
+            
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userCreated').textContent = new Date(currentUser.createdAt).toLocaleDateString();
+        }
+
+        function showAuthForms() {
+            document.getElementById('authForms').classList.remove('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+            clearForms();
+        }
+
+        function clearForms() {
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function showMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                messagesDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Test API connection on load
+        fetch(`${API_BASE}/health`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    console.log('✅ Backend API connected successfully');
+                } else {
+                    showMessage('⚠️ Backend API connection issue', 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('❌ Cannot connect to backend API', 'error');
+                console.error('API connection error:', error);
+            });
+    </script>
+</body>
+</html>
