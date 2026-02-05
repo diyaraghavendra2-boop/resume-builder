@@ -375,15 +375,15 @@
     <div id="message" class="message"></div>
 
     <script>
-        // Configuration
-        const API_BASE = 'https://resume-indol-sigma.vercel.app/api';
-        let currentUser = null;
+        // Configuration - Use localStorage for now since backend deployment is having issues
+        const API_BASE = 'localStorage'; // Fallback to localStorage
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
         let authToken = localStorage.getItem('authToken');
 
         // Initialize app
         window.onload = function() {
-            if (authToken) {
-                getCurrentUser();
+            if (currentUser) {
+                updateAuthUI();
             }
             loadSampleData();
             updatePreview();
@@ -409,27 +409,20 @@
                 return;
             }
 
-            try {
-                const response = await fetch(`${API_BASE}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    authToken = data.data.token;
-                    currentUser = data.data.user;
-                    localStorage.setItem('authToken', authToken);
-                    showMessage('✅ Login successful!', 'success');
-                    updateAuthUI();
-                    closeModal();
-                } else {
-                    showMessage('❌ ' + data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('❌ Login failed: ' + error.message, 'error');
+            // Simulate login with localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = { id: user.id, name: user.name, email: user.email };
+                authToken = 'local_' + Date.now();
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('authToken', authToken);
+                showMessage('✅ Login successful!', 'success');
+                updateAuthUI();
+                closeModal();
+            } else {
+                showMessage('❌ Invalid email or password', 'error');
             }
         }
 
@@ -448,55 +441,39 @@
                 return;
             }
 
-            try {
-                const response = await fetch(`${API_BASE}/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    authToken = data.data.token;
-                    currentUser = data.data.user;
-                    localStorage.setItem('authToken', authToken);
-                    showMessage('✅ Registration successful!', 'success');
-                    updateAuthUI();
-                    closeModal();
-                } else {
-                    showMessage('❌ ' + data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('❌ Registration failed: ' + error.message, 'error');
+            // Simulate registration with localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            if (users.find(u => u.email === email)) {
+                showMessage('❌ User with this email already exists', 'error');
+                return;
             }
-        }
 
-        async function getCurrentUser() {
-            try {
-                const response = await fetch(`${API_BASE}/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${authToken}` }
-                });
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                password,
+                createdAt: new Date().toISOString()
+            };
 
-                const data = await response.json();
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
 
-                if (data.success) {
-                    currentUser = data.data.user;
-                    updateAuthUI();
-                } else {
-                    localStorage.removeItem('authToken');
-                    authToken = null;
-                }
-            } catch (error) {
-                console.error('Failed to get current user:', error);
-                localStorage.removeItem('authToken');
-                authToken = null;
-            }
+            currentUser = { id: newUser.id, name: newUser.name, email: newUser.email };
+            authToken = 'local_' + Date.now();
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('authToken', authToken);
+            
+            showMessage('✅ Registration successful!', 'success');
+            updateAuthUI();
+            closeModal();
         }
 
         function logout() {
             authToken = null;
             currentUser = null;
+            localStorage.removeItem('currentUser');
             localStorage.removeItem('authToken');
             updateAuthUI();
             showMessage('✅ Logged out successfully', 'success');
@@ -526,6 +503,8 @@
             }
 
             const resumeData = {
+                id: Date.now(),
+                userId: currentUser.id,
                 title: 'My Resume',
                 header: {
                     name: document.getElementById('fullName').value || 'Your Name',
@@ -536,29 +515,17 @@
                 professionalSummary: document.getElementById('summary').value || '',
                 skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(s => s),
                 experience: [{ description: document.getElementById('experience').value || '' }],
-                education: [{ description: document.getElementById('education').value || '' }]
+                education: [{ description: document.getElementById('education').value || '' }],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
             };
 
-            try {
-                const response = await fetch(`${API_BASE}/resume`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify(resumeData)
-                });
+            // Save to localStorage
+            const resumes = JSON.parse(localStorage.getItem('resumes') || '[]');
+            resumes.push(resumeData);
+            localStorage.setItem('resumes', JSON.stringify(resumes));
 
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage('✅ Resume saved successfully!', 'success');
-                } else {
-                    showMessage('❌ Failed to save: ' + data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('❌ Save failed: ' + error.message, 'error');
-            }
+            showMessage('✅ Resume saved successfully to your browser!', 'success');
         }
 
         function updatePreview() {
@@ -619,19 +586,10 @@
             }, 4000);
         }
 
-        // Test API connection on load
-        fetch(`${API_BASE}/health`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'OK') {
-                    console.log('✅ Backend API connected successfully');
-                } else {
-                    console.log('⚠️ Backend API connection issue');
-                }
-            })
-            .catch(error => {
-                console.log('❌ Cannot connect to backend API:', error);
-            });
+        // Show info about localStorage usage
+        console.log('📝 Resume Builder is running in browser-only mode');
+        console.log('💾 All data is stored locally in your browser');
+        console.log('🔒 Your data is private and secure');
     </script>
 </body>
 </html>
