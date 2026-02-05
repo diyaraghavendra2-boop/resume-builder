@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Resume Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc; 
+            color: #334155; 
+            line-height: 1.6; 
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            text-align: center;
+        }
+        .content { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+        }
+        .panel { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group textarea { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-family: inherit;
+        }
+        .btn { 
+            background: #6366f1; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        .btn:hover { background: #5a5fd8; }
+        .resume-header { 
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+        .section { margin-bottom: 20px; }
+        .section h3 { color: #6366f1; border-bottom: 2px solid #6366f1; padding-bottom: 5px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Simple Resume Builder</h1>
+            <button class="btn" onclick="saveResume()">Save</button>
+            <button class="btn" onclick="printResume()">Print PDF</button>
+        </div>
+        
+        <div class="content">
+            <div class="panel">
+                <h2>Edit Resume</h2>
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" id="name" placeholder="Your Name" onchange="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Role:</label>
+                    <input type="text" id="role" placeholder="Your Role" onchange="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="email" placeholder="your@email.com" onchange="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Phone:</label>
+                    <input type="tel" id="phone" placeholder="(555) 123-4567" onchange="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Summary:</label>
+                    <textarea id="summary" rows="4" placeholder="Professional summary..." onchange="updatePreview()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Skills (comma separated):</label>
+                    <textarea id="skills" rows="3" placeholder="JavaScript, React, Node.js..." onchange="updatePreview()"></textarea>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>Preview</h2>
+                <div id="resume-preview">
+                    <div class="resume-header">
+                        <h1 id="preview-name">Your Name</h1>
+                        <h2 id="preview-role">Your Role</h2>
+                        <p id="preview-contact">your@email.com | (555) 123-4567</p>
+                    </div>
+                    <div class="section">
+                        <h3>Professional Summary</h3>
+                        <p id="preview-summary">Your professional summary will appear here...</p>
+                    </div>
+                    <div class="section">
+                        <h3>Skills</h3>
+                        <div id="preview-skills">Your skills will appear here...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Simple resume builder loading...');
+        
+        function updatePreview() {
+            try {
+                document.getElementById('preview-name').textContent = document.getElementById('name').value || 'Your Name';
+                document.getElementById('preview-role').textContent = document.getElementById('role').value || 'Your Role';
+                document.getElementById('preview-contact').textContent = 
+                    (document.getElementById('email').value || 'your@email.com') + ' | ' + 
+                    (document.getElementById('phone').value || '(555) 123-4567');
+                document.getElementById('preview-summary').textContent = 
+                    document.getElementById('summary').value || 'Your professional summary will appear here...';
+                document.getElementById('preview-skills').textContent = 
+                    document.getElementById('skills').value || 'Your skills will appear here...';
+                console.log('Preview updated successfully');
+            } catch (e) {
+                console.error('Error updating preview:', e);
+            }
+        }
+        
+        function saveResume() {
+            try {
+                const data = {
+                    name: document.getElementById('name').value,
+                    role: document.getElementById('role').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    summary: document.getElementById('summary').value,
+                    skills: document.getElementById('skills').value
+                };
+                localStorage.setItem('simpleResume', JSON.stringify(data));
+                alert('Resume saved!');
+            } catch (e) {
+                console.error('Error saving:', e);
+                alert('Error saving resume');
+            }
+        }
+        
+        function loadResume() {
+            try {
+                const saved = localStorage.getItem('simpleResume');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('name').value = data.name || '';
+                    document.getElementById('role').value = data.role || '';
+                    document.getElementById('email').value = data.email || '';
+                    document.getElementById('phone').value = data.phone || '';
+                    document.getElementById('summary').value = data.summary || '';
+                    document.getElementById('skills').value = data.skills || '';
+                    updatePreview();
+                }
+            } catch (e) {
+                console.error('Error loading:', e);
+            }
+        }
+        
+        function printResume() {
+            window.print();
+        }
+        
+        // Load saved data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, loading saved resume...');
+            loadResume();
+            updatePreview();
+        });
+        
+        console.log('Simple resume builder script loaded');
+    </script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Compass - Resumes Collection Guide</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .content { padding: 30px; }
+        .step {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .step-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #dc2626;
+            margin-bottom: 15px;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #92400e;
+            font-weight: bold;
+        }
+        .arrow {
+            color: #dc2626;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 MongoDB Compass - Find Resume Names</h1>
+            <p>Step-by-step guide to see Purnima, manju, aarav, diya in resumes collection</p>
+        </div>
+        
+        <div class="content">
+            <div class="step">
+                <div class="step-title">🔄 Step 1: Switch to Resumes Collection</div>
+                <p>You're currently viewing the <span class="highlight">"users"</span> collection. You need to switch to <span class="highlight">"resumes"</span>:</p>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li>In the left sidebar, look for <strong>"resumes"</strong> (should be below "users")</li>
+                    <li><strong>Click on "resumes"</strong> collection</li>
+                    <li>You should see 8 documents (not 4 like in users)</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <div class="step-title">👀 Step 2: What Each Resume Document Looks Like</div>
+                <p>Each document in the resumes collection should have this structure:</p>
+                <div class="code-block">{
+  "_id": ObjectId("679abc123..."),
+  "userId": ObjectId("679def456..."),
+  "title": "My Resume",
+  <span class="highlight">"header": {
+    "name": "Purnima",</span>     <span class="arrow">← THE NAME YOU WANT!</span>
+    <span class="highlight">"role": "Software Developer",
+    "email": "john.doe@email.com",</span>
+    "phone": "+1234567890",
+    "location": "City, State",
+    "linkedin": "linkedin.com/in/...",
+    "website": "...",
+    "profilePicture": ""
+  <span class="highlight">},</span>
+  "professionalSummary": "...",
+  "skills": ["JavaScript", "React", "Node.js"],
+  "experience": [...],
+  "education": [...],
+  "certifications": [...],
+  "hobbies": [...],
+  "isPublic": false,
+  "createdAt": "2026-01-28T...",
+  "updatedAt": "2026-01-28T..."
+}</div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">🔍 Step 3: Find the Names</div>
+                <p>Look for these specific names in the <span class="highlight">"header.name"</span> field:</p>
+                <div class="success">
+                    <strong>✅ Expected Names:</strong><br>
+                    • Document 1: "name": "Purnima"<br>
+                    • Document 2: "name": "manju"<br>
+                    • Document 3: "name": "aarav"<br>
+                    • Document 4: "name": "diya"<br>
+                    • Documents 5-8: "name": "Your Name" (defaults to ignore)
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">🛠️ Step 4: If You Don't See the Structure Above</div>
+                <div class="warning">
+                    <strong>Try these troubleshooting steps:</strong><br><br>
+                    <strong>1. Expand Documents:</strong><br>
+                    • Click the <strong>arrow (▶)</strong> next to each document to expand it<br>
+                    • Look for the "header" section<br><br>
+                    
+                    <strong>2. Change View Mode:</strong><br>
+                    • Make sure you're in <strong>"Document"</strong> view (not "Table" view)<br>
+                    • Look for view toggle buttons at the top<br><br>
+                    
+                    <strong>3. Refresh Data:</strong><br>
+                    • Click the <strong>refresh button</strong> (circular arrow)<br>
+                    • Wait a few seconds for data to load<br><br>
+                    
+                    <strong>4. Filter Out Defaults:</strong><br>
+                    • Click "Filter" button<br>
+                    • Enter: <code>{"header.name": {"$ne": "Your Name"}}</code><br>
+                    • This will show only the 4 named resumes
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">📋 Step 5: What You Should See</div>
+                <p>After switching to resumes collection, you should see something like:</p>
+                <div class="code-block">Document 1:
+{
+  "_id": ObjectId("..."),
+  "header": {
+    "name": "Purnima",
+    "role": "Software Developer"
+  }
+}
+
+Document 2:
+{
+  "_id": ObjectId("..."),
+  "header": {
+    "name": "manju", 
+    "role": "Software Developer"
+  }
+}
+
+Document 3:
+{
+  "_id": ObjectId("..."),
+  "header": {
+    "name": "aarav",
+    "role": "Software Developer" 
+  }
+}
+
+Document 4:
+{
+  "_id": ObjectId("..."),
+  "header": {
+    "name": "diya",
+    "role": "Software Developer"
+  }
+}</div>
+            </div>
+
+            <div class="success">
+                <h3>🎯 Key Point:</h3>
+                <p>You were looking in the <strong>"users"</strong> collection (which shows user accounts), but the resume names are stored in the <strong>"resumes"</strong> collection under <strong>"header.name"</strong>!</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

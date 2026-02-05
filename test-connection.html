@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Backend Connection</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <div id="results"></div>
+    
+    <button onclick="testHealth()">Test Health Check</button>
+    <button onclick="testRegister()">Test Registration</button>
+    <button onclick="testLogin()">Test Login</button>
+    
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+        const results = document.getElementById('results');
+        
+        function addResult(message, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = `status ${isSuccess ? 'success' : 'error'}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                addResult(`✅ Health Check: ${data.message}`, true);
+            } catch (error) {
+                addResult(`❌ Health Check Failed: ${error.message}`, false);
+            }
+        }
+        
+        async function testRegister() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test User ' + Date.now(),
+                        email: `test${Date.now()}@example.com`,
+                        password: 'password123'
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    addResult(`✅ Registration: ${data.message}`, true);
+                    localStorage.setItem('testToken', data.data.token);
+                } else {
+                    addResult(`❌ Registration: ${data.message}`, false);
+                }
+            } catch (error) {
+                addResult(`❌ Registration Failed: ${error.message}`, false);
+            }
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password123'
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    addResult(`✅ Login: ${data.message}`, true);
+                } else {
+                    addResult(`❌ Login: ${data.message}`, false);
+                }
+            } catch (error) {
+                addResult(`❌ Login Failed: ${error.message}`, false);
+            }
+        }
+        
+        // Auto-test on load
+        testHealth();
+    </script>
+</body>
+</html>

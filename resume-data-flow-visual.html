@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder - Data Flow Diagrams</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .content { padding: 30px; }
+        .flow-section {
+            margin-bottom: 40px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .flow-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .flow-content {
+            padding: 25px;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 5px solid #6366f1;
+        }
+        .step-number {
+            background: #6366f1;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        .step-description {
+            color: #64748b;
+            font-size: 14px;
+        }
+        .arrow {
+            text-align: center;
+            font-size: 24px;
+            color: #6366f1;
+            margin: 10px 0;
+        }
+        .data-box {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .visual-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .flow-box {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            min-width: 80px;
+            margin: 5px;
+        }
+        .flow-arrow {
+            color: #6366f1;
+            font-size: 20px;
+            margin: 0 10px;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #92400e;
+            font-weight: bold;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fef2f2; color: #dc2626; }
+        .info { background: #eff6ff; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Resume Builder - Data Flow Diagrams</h1>
+            <p>Visual representation of data movement through the system</p>
+        </div>
+        
+        <div class="content">
+            <!-- CREATE RESUME FLOW -->
+            <div class="flow-section">
+                <div class="flow-header">
+                    📝 CREATE RESUME FLOW
+                </div>
+                <div class="flow-content">
+                    <div class="visual-flow">
+                        <div class="flow-box">👤 User</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">📋 Form</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">✅ Validate</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🌐 API</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🔧 Backend</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">💾 MongoDB</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">✅ Success</div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">User Input</div>
+                            <div class="step-description">User fills out resume form with personal information, skills, experience, and education</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Frontend Data Collection</div>
+                            <div class="step-description">JavaScript collects form data into structured object</div>
+                            <div class="data-box">{
+  header: { name: "John Doe", email: "john@example.com" },
+  skills: ["JavaScript", "React", "Node.js"],
+  experience: [{ title: "Developer", company: "Tech Corp" }]
+}</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Frontend Validation</div>
+                            <div class="step-description">Client-side validation: required fields, email format, phone format</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">API Request</div>
+                            <div class="step-description">POST /api/resume with JWT token and JSON payload</div>
+                            <div class="data-box">POST /api/resume
+Headers: { Authorization: "Bearer JWT_TOKEN" }
+Body: { resume data in JSON format }</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Backend Processing</div>
+                            <div class="step-description">Authentication, validation, data transformation, and business logic</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <div class="step-title">Database Storage</div>
+                            <div class="step-description">MongoDB saves resume document with ObjectId, timestamps, and user association</div>
+                            <div class="data-box">{
+  _id: ObjectId("..."),
+  userId: ObjectId("..."),
+  header: { name: "John Doe" },
+  createdAt: ISODate("2024-01-28T..."),
+  updatedAt: ISODate("2024-01-28T...")
+}</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">7</div>
+                        <div class="step-content">
+                            <div class="step-title">Success Response</div>
+                            <div class="step-description">Backend returns success response with created resume data</div>
+                            <div class="data-box">{
+  success: true,
+  message: "Resume created successfully",
+  data: { resume: { _id: "...", header: {...} } }
+}</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">8</div>
+                        <div class="step-content">
+                            <div class="step-title">UI Update</div>
+                            <div class="step-description">Frontend shows success message and updates interface</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FETCH RESUME FLOW -->
+            <div class="flow-section">
+                <div class="flow-header">
+                    📖 FETCH RESUME FLOW
+                </div>
+                <div class="flow-content">
+                    <div class="visual-flow">
+                        <div class="flow-box">👤 User</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🖱️ Click</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🌐 GET API</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🔐 Auth</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🔍 Query DB</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">📦 Return Data</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🎨 Render</div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">User Request</div>
+                            <div class="step-description">User clicks "View Resume" or navigates to resume page</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">API Request</div>
+                            <div class="step-description">GET /api/resume with authentication token</div>
+                            <div class="data-box">GET /api/resume
+Headers: { Authorization: "Bearer JWT_TOKEN" }</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Authentication</div>
+                            <div class="step-description">Backend validates JWT token and extracts user ID</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Database Query</div>
+                            <div class="step-description">MongoDB query for user's resumes with sorting and pagination</div>
+                            <div class="data-box">Resume.find({ userId: req.user._id })
+  .sort({ updatedAt: -1 })
+  .limit(10)</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Data Response</div>
+                            <div class="step-description">Backend formats and returns resume data with pagination info</div>
+                            <div class="data-box">{
+  success: true,
+  data: {
+    resumes: [{ _id: "...", header: {...}, skills: [...] }],
+    pagination: { current: 1, pages: 1, total: 1 }
+  }
+}</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <div class="step-title">Frontend Rendering</div>
+                            <div class="step-description">JavaScript processes data and renders resume in UI</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ERROR HANDLING -->
+            <div class="flow-section">
+                <div class="flow-header">
+                    🛡️ ERROR HANDLING FLOW
+                </div>
+                <div class="flow-content">
+                    <div class="visual-flow">
+                        <div class="flow-box error">❌ Error</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🔍 Detect</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">📝 Log</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">📤 Response</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">⚠️ Show User</div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Validation Errors</div>
+                            <div class="step-description">Frontend and backend validation with user-friendly error messages</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Authentication Errors</div>
+                            <div class="step-description">Invalid JWT tokens redirect to login page</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Database Errors</div>
+                            <div class="step-description">Connection issues and query errors handled gracefully</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECURITY FLOW -->
+            <div class="flow-section">
+                <div class="flow-header">
+                    🔐 SECURITY & AUTHENTICATION FLOW
+                </div>
+                <div class="flow-content">
+                    <div class="visual-flow">
+                        <div class="flow-box">🔑 Login</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🎫 JWT Token</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">💾 Store</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">📤 Send</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">✅ Validate</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box">🚪 Access</div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">User Authentication</div>
+                            <div class="step-description">JWT tokens for secure API access and user identification</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Data Authorization</div>
+                            <div class="step-description">Users can only access their own resume data</div>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Input Sanitization</div>
+                            <div class="step-description">All user input validated and sanitized before database storage</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

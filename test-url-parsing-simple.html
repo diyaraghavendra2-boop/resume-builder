@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Parsing and Data Loading Tests</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>URL Parsing and Data Loading Property Tests</h1>
+    <div id="test-results"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Simple property-based testing framework
+        class SimplePropertyTester {
+            constructor() {
+                this.results = [];
+            }
+
+            // Generate random data for testing
+            generateString(maxLength = 50) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ';
+                let result = '';
+                const length = Math.floor(Math.random() * maxLength);
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+
+            generateEmail() {
+                return `${this.generateString(10)}@${this.generateString(10)}.com`;
+            }
+
+            generateUrl() {
+                return `https://${this.generateString(10)}.com`;
+            }
+
+            generatePersonalData() {
+                return {
+                    fullName: this.generateString(30),
+                    title: this.generateString(50),
+                    email: this.generateEmail(),
+                    phone: this.generateString(15),
+                    location: this.generateString(30)
+                };
+            }
+
+            generateResumeData() {
+                return {
+                    personal: this.generatePersonalData(),
+                    summary: this.generateString(200),
+                    experience: Array.from({length: Math.floor(Math.random() * 3)}, () => ({
+                        jobTitle: this.generateString(50),
+                        company: this.generateString(50),
+                        startDate: '2020',
+                        endDate: '2023',
+                        description: this.generateString(200)
+                    })),
+                    education: Array.from({length: Math.floor(Math.random() * 2)}, () => ({
+                        degree: this.generateString(50),
+                        school: this.generateString(50),
+                        gradYear: '2020',
+                        gpa: '3.5'
+                    })),
+                    skills: Array.from({length: Math.floor(Math.random() * 5)}, () => ({
+                        name: this.generateString(20),
+                        level: ['Beginner', 'Intermediate', 'Advanced', 'Expert'][Math.floor(Math.random() * 4)]
+                    })),
+                    projects: Array.from({length: Math.floor(Math.random() * 3)}, () => ({
+                        name: this.generateString(30),
+                        description: this.generateString(100),
+                        link: this.generateUrl()
+                    })),
+                    social: {
+                        linkedin: this.generateUrl(),
+                        github: this.generateUrl(),
+                        portfolio: this.generateUrl()
+                    },
+                    certifications: Array.from({length: Math.floor(Math.random() * 3)}, () => this.generateString(50)),
+                    languages: Array.from({length: Math.floor(Math.random() * 3)}, () => this.generateString(20)),
+                    hobbies: Array.from({length: Math.floor(Math.random() * 3)}, () => this.generateString(20))
+                };
+            }
+
+            generateSettings() {
+                return {
+                    template: ['minimal', 'creative', 'corporate'][Math.floor(Math.random() * 3)],
+                    primaryColor: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
+                    fontFamily: ['Inter', 'Arial', 'Georgia'][Math.floor(Math.random() * 3)],
+                    isDarkTheme: Math.random() > 0.5
+                };
+            }
+
+            assert(property, numRuns = 50) {
+                let passed = 0;
+                let failed = 0;
+                let errors = [];
+
+                for (let i = 0; i < numRuns; i++) {
+                    try {
+                        if (property()) {
+                            passed++;
+                        } else {
+                            failed++;
+                            errors.push(`Run ${i + 1}: Property returned false`);
+                        }
+                    } catch (error) {
+                        failed++;
+                        errors.push(`Run ${i + 1}: ${error.message}`);
+                    }
+                }
+
+                return { passed, failed, errors, total: numRuns };
+            }
+
+            logResult(testName, result) {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.failed === 0 ? 'pass' : 'fail'}`;
+                
+                let html = `<strong>${testName}</strong><br>`;
+                html += `Passed: ${result.passed}/${result.total} runs<br>`;
+                
+                if (result.failed > 0) {
+                    html += `Failed: ${result.failed}<br>`;
+                    html += `<details><summary>Error Details</summary><pre>${result.errors.slice(0, 5).join('\n')}</pre></details>`;
+                }
+                
+                div.innerHTML = html;
+                document.getElementById('test-results').appendChild(div);
+            }
+        }
+
+        // Initialize test framework
+        const tester = new SimplePropertyTester();
+
+        // Mock ResumeBuilder for testing
+        class MockResumeBuilder {
+            constructor() {
+                this.resumeData = {
+                    personal: { fullName: '', title: '', email: '', phone: '', location: '' },
+                    summary: '',
+                    experience: [],
+                    education: [],
+                    skills: [],
+                    projects: [],
+                    social: { linkedin: '', github: '', portfolio: '' },
+                    certifications: [],
+                    languages: [],
+                    hobbies: []
+                };
+                this.shareManager = new ShareManager();
+                this.showUrlErrorCalled = false;
+                this.cleanURLCalled = false;
+                this.loadDefaultResumeCalled = false;
+            }
+
+            showUrlError(message) {
+                this.showUrlErrorCalled = true;
+                this.lastErrorMessage = message;
+            }
+
+            cleanURL() {
+                this.cleanURLCalled = true;
+            }
+
+            loadDefaultResume() {
+                this.loadDefaultResumeCalled = true;
+            }
+
+            validateLoadedData(shareData) {
+                try {
+                    if (!this.shareManager.validateResumeData(shareData)) {
+                        return false;
+                    }
+
+                    const resumeData = shareData.resumeData;
+
+                    // Additional validation for data integrity
+                    if (resumeData.experience && resumeData.experience.length > 0) {
+                        for (const exp of resumeData.experience) {
+                            if (typeof exp !== 'object') {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if (resumeData.skills && resumeData.skills.length > 0) {
+                        for (const skill of resumeData.skills) {
+                            if (typeof skill !== 'object' || !skill.name) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            loadResumeData(shareData) {
+                // Simulate the enhanced loadResumeData method
+                let resumeData, settings;
+                
+                if (shareData.resumeData && shareData.settings) {
+                    resumeData = shareData.resumeData;
+                    settings = shareData.settings;
+                } else {
+                    resumeData = shareData;
+                    settings = shareData.settings || {};
+                }
+                
+                // Deep clone resume data
+                this.resumeData = JSON.parse(JSON.stringify(resumeData));
+                
+                // Ensure all required sections exist
+                this.ensureRequiredSections();
+                
+                return true;
+            }
+
+            ensureRequiredSections() {
+                if (!this.resumeData.personal || typeof this.resumeData.personal !== 'object') {
+                    this.resumeData.personal = { fullName: '', title: '', email: '', phone: '', location: '' };
+                }
+
+                if (typeof this.resumeData.summary !== 'string') {
+                    this.resumeData.summary = '';
+                }
+
+                const arraySections = ['experience', 'education', 'skills', 'projects'];
+                for (const section of arraySections) {
+                    if (!Array.isArray(this.resumeData[section])) {
+                        this.resumeData[section] = [];
+                    }
+                }
+
+                if (!this.resumeData.social || typeof this.resumeData.social !== 'object') {
+                    this.resumeData.social = { github: '', linkedin: '', portfolio: '' };
+                }
+
+                const optionalArraySections = ['certifications', 'languages', 'hobbies'];
+                for (const section of optionalArraySections) {
+                    if (!Array.isArray(this.resumeData[section])) {
+                        this.resumeData[section] = [];
+                    }
+                }
+            }
+
+            verifyDataLoading(shareData) {
+                try {
+                    const originalData = shareData.resumeData;
+                    const loadedData = this.resumeData;
+
+                    const arraySections = ['experience', 'education', 'skills', 'projects'];
+                    for (const section of arraySections) {
+                        if (originalData[section] && Array.isArray(originalData[section])) {
+                            if (!loadedData[section] || !Array.isArray(loadedData[section])) {
+                                return false;
+                            }
+                            if (originalData[section].length !== loadedData[section].length) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+        }
+
+        // Run Property Tests
+        document.addEventListener('DOMContentLoaded', () => {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'test-result info';
+            infoDiv.innerHTML = '<strong>Running Property-Based Tests...</strong><br>Testing URL parsing, data validation, and comprehensive data loading.';
+            document.getElementById('test-results').appendChild(infoDiv);
+
+            // Property 9: Data Validation and Error Handling
+            const result1 = tester.assert(() => {
+                const mockBuilder = new MockResumeBuilder();
+                
+                // Test with invalid JSON strings
+                const invalidJsonStrings = [
+                    '{"invalid": json}',
+                    '{missing: quotes}',
+                    'not json at all',
+                    '',
+                    'null',
+                    '[]'
+                ];
+
+                for (const invalidJson of invalidJsonStrings) {
+                    try {
+                        const encodedData = btoa(encodeURIComponent(invalidJson));
+                        const testUrl = `http://test.com?data=${encodedData}`;
+                        const result = mockBuilder.shareManager.parseShareURL(testUrl);
+                        
+                        // Should return null for invalid data
+                        if (result !== null) {
+                            return false;
+                        }
+                    } catch (error) {
+                        // Expected for invalid data
+                    }
+                }
+
+                // Test with invalid data structures
+                const invalidStructures = [
+                    null,
+                    "string",
+                    123,
+                    [],
+                    {},
+                    { resumeData: "not an object" },
+                    { settings: "not an object" },
+                    { resumeData: {}, settings: {} }, // Missing required fields
+                    { 
+                        resumeData: { 
+                            personal: "not an object",
+                            experience: "not an array",
+                            education: 123,
+                            skills: null,
+                            projects: {},
+                            social: []
+                        }, 
+                        settings: { template: "invalid", primaryColor: "invalid", fontFamily: "" }
+                    }
+                ];
+
+                for (const invalidData of invalidStructures) {
+                    const isValid = mockBuilder.shareManager.validateResumeData(invalidData);
+                    if (isValid) {
+                        return false; // Should be invalid
+                    }
+                }
+
+                return true;
+            }, 30);
+
+            tester.logResult('Property 9: Data Validation and Error Handling', result1);
+
+            // Property 10: Comprehensive Data Loading
+            const result2 = tester.assert(() => {
+                const mockBuilder = new MockResumeBuilder();
+                
+                // Generate valid test data
+                const resumeData = tester.generateResumeData();
+                const settings = tester.generateSettings();
+                const shareData = { resumeData, settings };
+
+                // Set up existing data that should be cleared
+                mockBuilder.resumeData = {
+                    personal: { fullName: 'Old Name', title: 'Old Title', email: 'old@email.com', phone: '123', location: 'Old City' },
+                    summary: 'Old summary',
+                    experience: [{ jobTitle: 'Old Job', company: 'Old Company', startDate: '2020', endDate: '2021', description: 'Old desc' }],
+                    education: [{ degree: 'Old Degree', school: 'Old School', gradYear: '2020', gpa: '3.0' }],
+                    skills: [{ name: 'Old Skill', level: 'Beginner' }],
+                    projects: [{ name: 'Old Project', description: 'Old desc', link: 'http://old.com' }],
+                    social: { linkedin: 'http://old-linkedin.com', github: 'http://old-github.com', portfolio: 'http://old-portfolio.com' },
+                    certifications: ['Old Cert'],
+                    languages: ['Old Language'],
+                    hobbies: ['Old Hobby']
+                };
+
+                // Load the new data
+                mockBuilder.loadResumeData(shareData);
+
+                // Verify all sections were loaded correctly
+                if (JSON.stringify(mockBuilder.resumeData.personal) !== JSON.stringify(shareData.resumeData.personal)) {
+                    return false;
+                }
+
+                if (mockBuilder.resumeData.summary !== shareData.resumeData.summary) {
+                    return false;
+                }
+
+                // Check array sections
+                const arraySections = ['experience', 'education', 'skills', 'projects'];
+                for (const section of arraySections) {
+                    if (mockBuilder.resumeData[section].length !== shareData.resumeData[section].length) {
+                        return false;
+                    }
+                }
+
+                // Verify data loading integrity
+                const isVerified = mockBuilder.verifyDataLoading(shareData);
+                if (!isVerified) {
+                    return false;
+                }
+
+                // Ensure all required sections exist
+                const requiredSections = ['personal', 'experience', 'education', 'skills', 'projects', 'social'];
+                for (const section of requiredSections) {
+                    if (!(section in mockBuilder.resumeData)) {
+                        return false;
+                    }
+                }
+
+                // Ensure array sections are arrays
+                const arrayCheckSections = ['experience', 'education', 'skills', 'projects', 'certifications', 'languages', 'hobbies'];
+                for (const section of arrayCheckSections) {
+                    if (!Array.isArray(mockBuilder.resumeData[section])) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }, 30);
+
+            tester.logResult('Property 10: Comprehensive Data Loading', result2);
+
+            // Additional edge case tests
+            const result3 = tester.assert(() => {
+                const mockBuilder = new MockResumeBuilder();
+                
+                // Test with corrupted Base64 data
+                const corruptedData = [
+                    'invalid-base64-data',
+                    'SGVsbG8gV29ybGQ=!', // Valid Base64 with invalid chars
+                    '',
+                    '!@#$%^&*()',
+                ];
+
+                for (const corrupt of corruptedData) {
+                    const testUrl = `http://test.com?data=${corrupt}`;
+                    const result = mockBuilder.shareManager.parseShareURL(testUrl);
+                    
+                    // Should return null for corrupted data
+                    if (result !== null) {
+                        return false;
+                    }
+                }
+
+                // Test URL parsing edge cases
+                const edgeUrls = [
+                    'http://test.com', // No data parameter
+                    'http://test.com?data=', // Empty data parameter
+                    'http://test.com?other=value', // Wrong parameter
+                    'not-a-url', // Invalid URL
+                    '', // Empty string
+                ];
+
+                for (const url of edgeUrls) {
+                    try {
+                        const result = mockBuilder.shareManager.parseShareURL(url);
+                        // Should handle gracefully (return null for invalid URLs)
+                        if (result !== null && url !== 'http://test.com' && url !== 'http://test.com?other=value') {
+                            return false;
+                        }
+                    } catch (error) {
+                        // Some errors are expected for invalid URLs
+                    }
+                }
+
+                return true;
+            }, 20);
+
+            tester.logResult('Edge Cases: Corrupted Data and URL Parsing', result3);
+
+            // Summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'test-result info';
+            summaryDiv.innerHTML = '<strong>Test Summary:</strong><br>Property-based tests completed for URL parsing and data loading system. Tests validate Requirements 5.3, 5.4, 8.1, 8.2, 8.4, 8.5.';
+            document.getElementById('test-results').appendChild(summaryDiv);
+        });
+    </script>
+</body>
+</html>

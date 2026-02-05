@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Resume Builder</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .error { color: red; background: #ffe6e6; padding: 10px; margin: 10px 0; }
+        .success { color: green; background: #e6ffe6; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Resume Builder Debug</h1>
+    <div id="status">Loading...</div>
+    
+    <script>
+        console.log('Debug script starting...');
+        
+        function updateStatus(message, isError = false) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.className = isError ? 'error' : 'success';
+        }
+        
+        // Test 1: Basic JavaScript
+        try {
+            updateStatus('✅ JavaScript is working');
+            console.log('JavaScript test passed');
+        } catch (e) {
+            updateStatus('❌ JavaScript error: ' + e.message, true);
+        }
+        
+        // Test 2: Fetch defaultResume.json
+        fetch('defaultResume.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateStatus('✅ defaultResume.json loaded successfully');
+                console.log('JSON data:', data);
+            })
+            .catch(error => {
+                updateStatus('❌ Failed to load defaultResume.json: ' + error.message, true);
+                console.error('JSON error:', error);
+            });
+        
+        // Test 3: LocalStorage
+        try {
+            localStorage.setItem('test', 'value');
+            const testValue = localStorage.getItem('test');
+            if (testValue === 'value') {
+                updateStatus('✅ LocalStorage is working');
+                localStorage.removeItem('test');
+            } else {
+                throw new Error('LocalStorage read/write failed');
+            }
+        } catch (e) {
+            updateStatus('❌ LocalStorage error: ' + e.message, true);
+        }
+        
+        // Test 4: DOM Ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM is ready');
+            setTimeout(() => {
+                updateStatus('✅ All tests completed. Check console for details.');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

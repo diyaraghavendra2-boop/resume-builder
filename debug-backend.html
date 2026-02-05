@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Resume Builder</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        .header { background: #1976d2; color: white; padding: 20px; margin-bottom: 20px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Resume Builder Debug</h1>
+        <div id="authButtons">
+            <button onclick="showLogin()">Login</button>
+            <button onclick="showRegister()">Register</button>
+        </div>
+    </div>
+
+    <div id="debugLog"></div>
+    
+    <div id="loginModal" style="display: none;">
+        <h3>Login</h3>
+        <input type="email" id="loginEmail" placeholder="Email">
+        <input type="password" id="loginPassword" placeholder="Password">
+        <button onclick="handleLogin()">Login</button>
+        <button onclick="hideModals()">Cancel</button>
+    </div>
+    
+    <div id="registerModal" style="display: none;">
+        <h3>Register</h3>
+        <input type="text" id="registerName" placeholder="Name">
+        <input type="email" id="registerEmail" placeholder="Email">
+        <input type="password" id="registerPassword" placeholder="Password">
+        <button onclick="handleRegister()">Register</button>
+        <button onclick="hideModals()">Cancel</button>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+        
+        function log(message, type = 'info') {
+            const debugLog = document.getElementById('debugLog');
+            const div = document.createElement('div');
+            div.className = `debug ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            debugLog.appendChild(div);
+            console.log(message);
+        }
+        
+        function showLogin() {
+            hideModals();
+            document.getElementById('loginModal').style.display = 'block';
+        }
+        
+        function showRegister() {
+            hideModals();
+            document.getElementById('registerModal').style.display = 'block';
+        }
+        
+        function hideModals() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('registerModal').style.display = 'none';
+        }
+        
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                log('Please fill in all fields', 'error');
+                return;
+            }
+            
+            try {
+                log('Attempting login...');
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                log(`Login response: ${JSON.stringify(data)}`);
+                
+                if (data.success) {
+                    authToken = data.data.token;
+                    currentUser = data.data.user;
+                    localStorage.setItem('authToken', authToken);
+                    log(`Login successful! Welcome ${currentUser.name}`, 'success');
+                    updateAuthUI();
+                    hideModals();
+                } else {
+                    log(`Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Login error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleRegister() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!name || !email || !password) {
+                log('Please fill in all fields', 'error');
+                return;
+            }
+            
+            try {
+                log('Attempting registration...');
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                log(`Register response: ${JSON.stringify(data)}`);
+                
+                if (data.success) {
+                    authToken = data.data.token;
+                    currentUser = data.data.user;
+                    localStorage.setItem('authToken', authToken);
+                    log(`Registration successful! Welcome ${currentUser.name}`, 'success');
+                    updateAuthUI();
+                    hideModals();
+                } else {
+                    log(`Registration failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Registration error: ${error.message}`, 'error');
+            }
+        }
+        
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            log('Logged out successfully');
+            updateAuthUI();
+        }
+        
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            if (currentUser) {
+                authButtons.innerHTML = `
+                    <span>Welcome, ${currentUser.name}!</span>
+                    <button onclick="logout()">Logout</button>
+                `;
+            } else {
+                authButtons.innerHTML = `
+                    <button onclick="showLogin()">Login</button>
+                    <button onclick="showRegister()">Register</button>
+                `;
+            }
+        }
+        
+        async function checkAuth() {
+            if (authToken) {
+                try {
+                    log('Checking existing auth token...');
+                    const response = await fetch(`${API_BASE}/auth/me`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        currentUser = data.data.user;
+                        log(`Already logged in as ${currentUser.name}`, 'success');
+                        updateAuthUI();
+                    } else {
+                        log('Auth token expired, please login again');
+                        logout();
+                    }
+                } catch (error) {
+                    log(`Auth check error: ${error.message}`, 'error');
+                    logout();
+                }
+            }
+        }
+        
+        // Test backend connection on load
+        async function testBackend() {
+            try {
+                log('Testing backend connection...');
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                log(`Backend health: ${data.message}`, 'success');
+            } catch (error) {
+                log(`Backend connection failed: ${error.message}`, 'error');
+                log('Make sure backend is running on port 5001', 'error');
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Debug page loaded');
+            testBackend();
+            checkAuth();
+        });
+    </script>
+</body>
+</html>

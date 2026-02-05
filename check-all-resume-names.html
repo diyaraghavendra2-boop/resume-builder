@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Resume Names Checker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .content { padding: 30px; }
+        .name-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .name-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #6366f1, #8b5cf6, #ec4899);
+        }
+        .resume-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+            margin-left: 15px;
+        }
+        .resume-info {
+            margin-left: 15px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+        .stats {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number { font-size: 28px; font-weight: 700; }
+        .stat-label { font-size: 14px; opacity: 0.9; }
+        .refresh-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .loading { text-align: center; padding: 50px; color: #64748b; }
+        .error { background: #fef2f2; color: #dc2626; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .compass-tip {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .compass-tip h3 { color: #1e40af; margin-bottom: 10px; }
+        .compass-tip ol { margin-left: 20px; }
+        .compass-tip li { margin-bottom: 8px; color: #374151; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 All Resume Names in Database</h1>
+            <p>See all the resume names you've created: Purnima, manju, aarav, diya</p>
+        </div>
+        
+        <div class="content">
+            <button onclick="checkAllNames()" class="refresh-btn">🔍 Check All Resume Names</button>
+            
+            <div id="statsContainer"></div>
+            <div id="namesContainer">
+                <div class="loading">Click the button above to check all resume names...</div>
+            </div>
+
+            <div class="compass-tip">
+                <h3>🧭 How to See These Names in MongoDB Compass:</h3>
+                <ol>
+                    <li><strong>Open MongoDB Compass</strong> and connect to your database</li>
+                    <li><strong>Click on "resumebuilder" database</strong> (or your database name)</li>
+                    <li><strong>Click on "resumes" collection</strong></li>
+                    <li><strong>Look for the "header.name" field</strong> in each document</li>
+                    <li><strong>If you don't see names, click "Refresh" button</strong> in Compass</li>
+                    <li><strong>Filter out defaults:</strong> Use filter <code>{"header.name": {"$ne": "Your Name"}}</code></li>
+                </ol>
+                <p><strong>💡 Tip:</strong> The names should appear in the "header.name" field of each resume document!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+
+        async function checkAllNames() {
+            try {
+                document.getElementById('namesContainer').innerHTML = 
+                    '<div class="loading">Checking all resume names in database...</div>';
+
+                // We'll make a direct call to check what's in the database
+                const response = await fetch(`${API_BASE}/resume/all-names`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    // If the endpoint doesn't exist, we'll create a workaround
+                    console.log('Direct endpoint not available, using alternative method');
+                    await checkNamesAlternative();
+                    return;
+                }
+
+                const data = await response.json();
+                displayAllNames(data.names || []);
+                
+            } catch (error) {
+                console.log('Using alternative method due to:', error.message);
+                await checkNamesAlternative();
+            }
+        }
+
+        async function checkNamesAlternative() {
+            try {
+                // Try to get data through existing endpoints
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    document.getElementById('namesContainer').innerHTML = 
+                        '<div class="error">Please login first at <a href="index.html">index.html</a> to check your resume names</div>';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/resume`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const names = data.data.resumes
+                        .filter(resume => resume.header?.name && resume.header.name !== 'Your Name')
+                        .map(resume => ({
+                            name: resume.header.name,
+                            role: resume.header.role || 'Not specified',
+                            email: resume.header.email || 'Not specified',
+                            createdAt: resume.createdAt,
+                            id: resume._id
+                        }));
+                    
+                    displayAllNames(names);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                document.getElementById('namesContainer').innerHTML = 
+                    `<div class="error">Failed to check names: ${error.message}<br><br>
+                    <strong>Manual Check:</strong><br>
+                    1. Open MongoDB Compass<br>
+                    2. Go to "resumebuilder" database → "resumes" collection<br>
+                    3. Look for "header.name" field in each document<br>
+                    4. You should see: Purnima, manju, aarav, diya</div>`;
+            }
+        }
+
+        function displayAllNames(names) {
+            // Update stats
+            document.getElementById('statsContainer').innerHTML = `
+                <div class="stats">
+                    <div class="stat-number">${names.length}</div>
+                    <div class="stat-label">Resume Names Found</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">${names.filter(n => n.name === 'Purnima').length}</div>
+                            <div class="stat-label">Purnima</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${names.filter(n => n.name === 'manju').length}</div>
+                            <div class="stat-label">manju</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${names.filter(n => n.name === 'aarav').length}</div>
+                            <div class="stat-label">aarav</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${names.filter(n => n.name === 'diya').length}</div>
+                            <div class="stat-label">diya</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (names.length === 0) {
+                document.getElementById('namesContainer').innerHTML = `
+                    <div class="error">
+                        <h3>No Named Resumes Found!</h3>
+                        <p>Expected to find: Purnima, manju, aarav, diya</p>
+                        <p>Please create resumes with these names first.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Display all names
+            document.getElementById('namesContainer').innerHTML = names.map((resume, index) => `
+                <div class="name-card">
+                    <div class="resume-name">${index + 1}. ${resume.name}</div>
+                    <div class="resume-info">
+                        <strong>Role:</strong> ${resume.role}<br>
+                        <strong>Email:</strong> ${resume.email}<br>
+                        <strong>Created:</strong> ${new Date(resume.createdAt).toLocaleString()}<br>
+                        <strong>Database ID:</strong> ${resume.id}
+                    </div>
+                </div>
+            `).join('');
+
+            // Show success message
+            const expectedNames = ['Purnima', 'manju', 'aarav', 'diya'];
+            const foundNames = names.map(n => n.name);
+            const missingNames = expectedNames.filter(name => !foundNames.includes(name));
+            
+            if (missingNames.length > 0) {
+                document.getElementById('namesContainer').innerHTML += `
+                    <div class="error">
+                        <h3>⚠️ Missing Names:</h3>
+                        <p>Expected but not found: ${missingNames.join(', ')}</p>
+                        <p>Please create resumes with these names.</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById('namesContainer').innerHTML += `
+                    <div style="background: #f0fdf4; color: #166534; padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px;">
+                        <h3>✅ All Expected Names Found!</h3>
+                        <p>Purnima, manju, aarav, diya - all present in database</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

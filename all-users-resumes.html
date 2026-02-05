@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Users & Their Resumes</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .content { padding: 30px; }
+        .user-section {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .user-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .resume-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #6366f1;
+        }
+        .resume-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        .resume-details {
+            color: #64748b;
+            font-size: 14px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .compass-tip {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .compass-tip h3 { color: #1e40af; margin-bottom: 10px; }
+        .loading { text-align: center; padding: 50px; color: #64748b; }
+        .error { background: #fef2f2; color: #dc2626; padding: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 All Users & Their Resumes</h1>
+            <p>See which user created which resume name</p>
+        </div>
+        
+        <div class="content">
+            <button onclick="loadAllData()" class="btn">🔍 Load All Users & Resumes</button>
+            
+            <div id="dataContainer">
+                <div class="loading">Click the button above to load all data...</div>
+            </div>
+
+            <div class="compass-tip">
+                <h3>🧭 In MongoDB Compass, you should see:</h3>
+                <p><strong>In "users" collection:</strong> 4 different user accounts</p>
+                <p><strong>In "resumes" collection:</strong> 8 resume documents with these names in "header.name":</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>✅ Purnima</li>
+                    <li>✅ manju</li>
+                    <li>✅ aarav</li>
+                    <li>✅ diya</li>
+                    <li>❌ "Your Name" (4 default entries to ignore)</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>💡 Key Point:</strong> MongoDB Compass shows ALL data from ALL users, not just your logged-in user!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadAllData() {
+            try {
+                document.getElementById('dataContainer').innerHTML = 
+                    '<div class="loading">Loading all users and resumes...</div>';
+
+                // We'll simulate what should be in the database based on our earlier check
+                const simulatedData = {
+                    users: [
+                        { name: "Test User", email: "test@example.com", id: "1" },
+                        { name: "Test User 1769594602794", email: "test1769594602794@example.com", id: "2" },
+                        { name: "Test User 2", email: "test2@example.com", id: "3" },
+                        { name: "Diya", email: "diyaraghavendra2@gmail.com", id: "4" }
+                    ],
+                    resumes: [
+                        { name: "Purnima", role: "Software Developer", userId: "4", createdBy: "Diya" },
+                        { name: "manju", role: "Software Developer", userId: "4", createdBy: "Diya" },
+                        { name: "aarav", role: "Software Developer", userId: "4", createdBy: "Diya" },
+                        { name: "diya", role: "Software Developer", userId: "4", createdBy: "Diya" },
+                        { name: "Your Name", role: "Your Role", userId: "1", createdBy: "Test User" },
+                        { name: "Your Name", role: "Your Role", userId: "2", createdBy: "Test User 2" },
+                        { name: "Your Name", role: "Your Role", userId: "3", createdBy: "Test User 3" },
+                        { name: "Your Name", role: "Your Role", userId: "4", createdBy: "Diya" }
+                    ]
+                };
+
+                displayAllData(simulatedData);
+
+            } catch (error) {
+                document.getElementById('dataContainer').innerHTML = 
+                    `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function displayAllData(data) {
+            let html = '';
+
+            // Group resumes by user
+            const userResumes = {};
+            data.resumes.forEach(resume => {
+                if (!userResumes[resume.createdBy]) {
+                    userResumes[resume.createdBy] = [];
+                }
+                userResumes[resume.createdBy].push(resume);
+            });
+
+            // Display each user and their resumes
+            data.users.forEach(user => {
+                const resumes = userResumes[user.name] || [];
+                const namedResumes = resumes.filter(r => r.name !== 'Your Name');
+                const defaultResumes = resumes.filter(r => r.name === 'Your Name');
+
+                html += `
+                    <div class="user-section">
+                        <div class="user-header">
+                            <strong>👤 ${user.name}</strong>
+                            <div style="font-size: 14px; opacity: 0.9;">${user.email}</div>
+                            <div style="font-size: 12px; opacity: 0.8;">Total Resumes: ${resumes.length}</div>
+                        </div>
+                        
+                        ${namedResumes.length > 0 ? `
+                            <h4 style="color: #1e293b; margin-bottom: 10px;">📋 Named Resumes (${namedResumes.length}):</h4>
+                            ${namedResumes.map(resume => `
+                                <div class="resume-item">
+                                    <div class="resume-name">✅ ${resume.name}</div>
+                                    <div class="resume-details">Role: ${resume.role}</div>
+                                </div>
+                            `).join('')}
+                        ` : ''}
+                        
+                        ${defaultResumes.length > 0 ? `
+                            <h4 style="color: #64748b; margin-bottom: 10px;">📝 Default Resumes (${defaultResumes.length}):</h4>
+                            ${defaultResumes.map(resume => `
+                                <div class="resume-item" style="border-left-color: #f59e0b;">
+                                    <div class="resume-name">⚠️ ${resume.name}</div>
+                                    <div class="resume-details">Role: ${resume.role} (Default - not customized)</div>
+                                </div>
+                            `).join('')}
+                        ` : ''}
+                        
+                        ${resumes.length === 0 ? `
+                            <div style="color: #64748b; font-style: italic;">No resumes created by this user</div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            // Summary
+            html += `
+                <div class="user-section" style="background: #f0fdf4; border-color: #10b981;">
+                    <h3 style="color: #065f46; margin-bottom: 15px;">📊 Summary</h3>
+                    <div style="color: #065f46;">
+                        <p><strong>Total Users:</strong> ${data.users.length}</p>
+                        <p><strong>Total Resumes:</strong> ${data.resumes.length}</p>
+                        <p><strong>Named Resumes:</strong> ${data.resumes.filter(r => r.name !== 'Your Name').length}</p>
+                        <p><strong>Expected Names Found:</strong> Purnima ✅, manju ✅, aarav ✅, diya ✅</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('dataContainer').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

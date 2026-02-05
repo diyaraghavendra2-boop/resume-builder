@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Resume Names Viewer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .content { padding: 30px; }
+        .resume-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .resume-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+        }
+        .resume-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #6366f1, #8b5cf6, #ec4899);
+        }
+        .resume-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+            margin-left: 15px;
+        }
+        .resume-details {
+            margin-left: 15px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+        .resume-meta {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .meta-item:last-child { margin-bottom: 0; }
+        .meta-label { font-weight: 600; color: #374151; }
+        .meta-value { color: #6b7280; }
+        .stats {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .stats-number { font-size: 36px; font-weight: 700; margin-bottom: 5px; }
+        .stats-label { opacity: 0.9; }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+            font-size: 18px;
+        }
+        .error {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .refresh-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 My Resume Names</h1>
+            <p>All the resume names you've created</p>
+        </div>
+        
+        <div class="content">
+            <button onclick="loadMyResumes()" class="refresh-btn">🔄 Refresh My Resumes</button>
+            
+            <div id="statsContainer"></div>
+            <div id="resumesContainer">
+                <div class="loading">Loading your resume names...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+
+        async function loadMyResumes() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    document.getElementById('resumesContainer').innerHTML = 
+                        '<div class="error">Please login first at <a href="index.html">index.html</a></div>';
+                    return;
+                }
+
+                document.getElementById('resumesContainer').innerHTML = 
+                    '<div class="loading">Loading your resume names...</div>';
+
+                // Load resumes
+                const response = await fetch(`${API_BASE}/resume`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayMyResumes(data.data.resumes);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                document.getElementById('resumesContainer').innerHTML = 
+                    `<div class="error">Failed to load resumes: ${error.message}<br>Make sure you're logged in!</div>`;
+            }
+        }
+
+        function displayMyResumes(resumes) {
+            // Filter out default "Your Name" resumes and sort by creation date
+            const realResumes = resumes
+                .filter(resume => resume.header?.name && resume.header.name !== 'Your Name')
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            // Update stats
+            document.getElementById('statsContainer').innerHTML = `
+                <div class="stats">
+                    <div class="stats-number">${realResumes.length}</div>
+                    <div class="stats-label">Resume Names Created</div>
+                </div>
+            `;
+
+            if (realResumes.length === 0) {
+                document.getElementById('resumesContainer').innerHTML = `
+                    <div class="error">No named resumes found. Create some resumes with actual names!</div>
+                `;
+                return;
+            }
+
+            // Display resumes
+            document.getElementById('resumesContainer').innerHTML = realResumes.map((resume, index) => `
+                <div class="resume-card">
+                    <div class="resume-name">${index + 1}. ${resume.header.name}</div>
+                    <div class="resume-details">
+                        <strong>Role:</strong> ${resume.header?.role || 'Not specified'}<br>
+                        <strong>Email:</strong> ${resume.header?.email || 'Not specified'}<br>
+                        <strong>Skills:</strong> ${(resume.skills || []).slice(0, 5).join(', ')}${resume.skills?.length > 5 ? ` (+${resume.skills.length - 5} more)` : ''}
+                    </div>
+                    <div class="resume-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">📅 Created:</span>
+                            <span class="meta-value">${new Date(resume.createdAt).toLocaleString()}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">📝 Updated:</span>
+                            <span class="meta-value">${new Date(resume.updatedAt).toLocaleString()}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">🆔 Database ID:</span>
+                            <span class="meta-value">${resume._id}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">🔒 Privacy:</span>
+                            <span class="meta-value">${resume.isPublic ? '🌐 Public' : '🔒 Private'}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Auto-load on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMyResumes();
+        });
+    </script>
+</body>
+</html>

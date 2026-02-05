@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Compass Step-by-Step Guide</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .content { padding: 30px; }
+        .step {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .step-number {
+            background: #6366f1;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: absolute;
+            top: -15px;
+            left: 20px;
+        }
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+            margin-left: 20px;
+        }
+        .step-content {
+            margin-left: 20px;
+            color: #475569;
+        }
+        .code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .screenshot-placeholder {
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            padding: 40px;
+            text-align: center;
+            color: #64748b;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧭 MongoDB Compass Guide</h1>
+            <p>Step-by-step guide to see your resume names</p>
+        </div>
+        
+        <div class="content">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-title">Open MongoDB Compass</div>
+                <div class="step-content">
+                    <p>Launch MongoDB Compass application on your computer</p>
+                    <div class="screenshot-placeholder">
+                        [Screenshot: MongoDB Compass startup screen]
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-title">Connect to Your Database</div>
+                <div class="step-content">
+                    <p>In the connection string field, enter:</p>
+                    <div class="code">mongodb://localhost:27017</div>
+                    <p>Then click the <strong>"Connect"</strong> button</p>
+                    <div class="screenshot-placeholder">
+                        [Screenshot: Connection screen with localhost:27017]
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-title">Find Your Database</div>
+                <div class="step-content">
+                    <p>On the left sidebar, you should see a database called <strong>"resumebuilder"</strong></p>
+                    <p>Click on it to expand</p>
+                    <div class="warning">
+                        <strong>⚠️ If you don't see "resumebuilder":</strong><br>
+                        • Make sure your backend server is running<br>
+                        • Check if you see any other databases<br>
+                        • Try refreshing the connection
+                    </div>
+                    <div class="screenshot-placeholder">
+                        [Screenshot: Left sidebar showing "resumebuilder" database]
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-title">Open Resumes Collection</div>
+                <div class="step-content">
+                    <p>Under "resumebuilder" database, you should see collections:</p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>users</strong> - Contains user accounts</li>
+                        <li><strong>resumes</strong> - Contains all resume data</li>
+                    </ul>
+                    <p>Click on <strong>"resumes"</strong> collection</p>
+                    <div class="screenshot-placeholder">
+                        [Screenshot: Collections list showing "users" and "resumes"]
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-title">View Resume Documents</div>
+                <div class="step-content">
+                    <p>You should now see a list of documents. Each document represents one resume.</p>
+                    <p>Look for these fields in each document:</p>
+                    <div class="code">{
+  "_id": "...",
+  "userId": "...",
+  "title": "My Resume",
+  "header": {
+    "name": "Purnima",     ← THE NAME YOU WANT TO SEE
+    "role": "Software Developer",
+    "email": "john.doe@email.com",
+    "phone": "...",
+    "location": "..."
+  },
+  "skills": [...],
+  "experience": [...],
+  "createdAt": "2026-01-28T...",
+  "updatedAt": "2026-01-28T..."
+}</div>
+                    <div class="success">
+                        <strong>✅ What you should find:</strong><br>
+                        • Documents with header.name = "Purnima"<br>
+                        • Documents with header.name = "manju"<br>
+                        • Documents with header.name = "aarav"<br>
+                        • Documents with header.name = "diya"
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">6</div>
+                <div class="step-title">Filter Out Default Names (Optional)</div>
+                <div class="step-content">
+                    <p>If you see many documents with "Your Name", filter them out:</p>
+                    <ol style="margin-left: 20px;">
+                        <li>Click the <strong>"Filter"</strong> button at the top</li>
+                        <li>Enter this filter:</li>
+                    </ol>
+                    <div class="code">{"header.name": {"$ne": "Your Name"}}</div>
+                    <p>This will hide all documents where header.name equals "Your Name"</p>
+                    <div class="screenshot-placeholder">
+                        [Screenshot: Filter input with the filter applied]
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">7</div>
+                <div class="step-title">Troubleshooting</div>
+                <div class="step-content">
+                    <div class="warning">
+                        <strong>If you don't see the names:</strong><br><br>
+                        <strong>1. Check Document View:</strong><br>
+                        • Make sure you're in "Document" view (not "Table" view)<br>
+                        • Look for the "header" object inside each document<br><br>
+                        
+                        <strong>2. Refresh the Data:</strong><br>
+                        • Click the refresh button (circular arrow)<br>
+                        • Disconnect and reconnect to MongoDB<br><br>
+                        
+                        <strong>3. Check Document Count:</strong><br>
+                        • You should see 8 documents total<br>
+                        • 4 with real names, 4 with "Your Name"<br><br>
+                        
+                        <strong>4. Expand Documents:</strong><br>
+                        • Click the arrow next to each document to expand it<br>
+                        • Look inside the "header" object for the "name" field
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">8</div>
+                <div class="step-title">Alternative: Use Web Viewer</div>
+                <div class="step-content">
+                    <p>If MongoDB Compass isn't showing the data clearly, use our web viewer:</p>
+                    <div class="code">http://localhost:8080/check-all-resume-names.html</div>
+                    <p>This will show you exactly what's in your database in a user-friendly format.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

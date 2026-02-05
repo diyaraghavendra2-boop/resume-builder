@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug MongoDB View</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .content { padding: 30px; }
+        .debug-section {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .debug-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+        .raw-data {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .btn {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .status.success { background: #d1fae5; color: #065f46; }
+        .status.error { background: #fef2f2; color: #dc2626; }
+        .status.warning { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Debug MongoDB View</h1>
+            <p>Let's see exactly what's in your database</p>
+        </div>
+        
+        <div class="content">
+            <button onclick="debugDatabase()" class="btn">🔍 Debug Database Contents</button>
+            
+            <div id="statusContainer"></div>
+            
+            <div class="debug-section">
+                <div class="debug-title">📊 Database Statistics</div>
+                <div id="statsContainer">Click the debug button above...</div>
+            </div>
+            
+            <div class="debug-section">
+                <div class="debug-title">📋 Raw Resume Data (First 3 Documents)</div>
+                <div class="raw-data" id="rawDataContainer">Click the debug button above...</div>
+            </div>
+            
+            <div class="debug-section">
+                <div class="debug-title">🎯 Extracted Names Only</div>
+                <div id="namesContainer">Click the debug button above...</div>
+            </div>
+            
+            <div class="debug-section">
+                <div class="debug-title">🧭 MongoDB Compass Instructions</div>
+                <div style="color: #475569; line-height: 1.6;">
+                    <p><strong>Based on what we find above, here's exactly what to look for in MongoDB Compass:</strong></p>
+                    <ol style="margin: 15px 0 15px 20px;">
+                        <li>Open MongoDB Compass</li>
+                        <li>Connect to: <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">mongodb://localhost:27017</code></li>
+                        <li>Click on <strong>"resumebuilder"</strong> database</li>
+                        <li>Click on <strong>"resumes"</strong> collection</li>
+                        <li>Look for documents that contain the structure shown in "Raw Resume Data" above</li>
+                        <li>Expand each document and look inside the <strong>"header"</strong> object</li>
+                        <li>The <strong>"name"</strong> field inside "header" should show: Purnima, manju, aarav, diya</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+
+        async function debugDatabase() {
+            try {
+                document.getElementById('statusContainer').innerHTML = 
+                    '<div class="status warning">🔍 Debugging database contents...</div>';
+
+                // Try the new endpoint first
+                let response = await fetch(`${API_BASE}/resume/all-names`);
+                let data = await response.json();
+
+                if (data.success) {
+                    displayDebugInfo(data.data);
+                } else {
+                    throw new Error('All-names endpoint failed, trying alternative...');
+                }
+
+            } catch (error) {
+                console.log('Trying alternative method:', error.message);
+                await debugAlternative();
+            }
+        }
+
+        async function debugAlternative() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    document.getElementById('statusContainer').innerHTML = 
+                        '<div class="status error">❌ Please login first at <a href="index.html">index.html</a></div>';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/resume`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const debugData = {
+                        names: data.data.resumes.map(resume => ({
+                            name: resume.header?.name || 'No Name',
+                            role: resume.header?.role || 'No Role',
+                            email: resume.header?.email || 'No Email',
+                            createdAt: resume.createdAt,
+                            id: resume._id,
+                            fullHeader: resume.header
+                        })),
+                        total: data.data.resumes.length,
+                        rawResumes: data.data.resumes.slice(0, 3) // First 3 for debugging
+                    };
+                    
+                    displayDebugInfo(debugData);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                document.getElementById('statusContainer').innerHTML = 
+                    `<div class="status error">❌ Debug failed: ${error.message}</div>`;
+            }
+        }
+
+        function displayDebugInfo(data) {
+            // Status
+            document.getElementById('statusContainer').innerHTML = 
+                '<div class="status success">✅ Database debug completed successfully!</div>';
+
+            // Stats
+            document.getElementById('statsContainer').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #6366f1;">${data.total || data.names.length}</div>
+                        <div style="color: #64748b;">Total Resumes</div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #10b981;">${data.names.filter(n => n.name !== 'Your Name').length}</div>
+                        <div style="color: #64748b;">Named Resumes</div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">${data.names.filter(n => n.name === 'Your Name').length}</div>
+                        <div style="color: #64748b;">Default Names</div>
+                    </div>
+                </div>
+            `;
+
+            // Raw data
+            const rawData = data.rawResumes || data.names.slice(0, 3);
+            document.getElementById('rawDataContainer').textContent = JSON.stringify(rawData, null, 2);
+
+            // Names
+            document.getElementById('namesContainer').innerHTML = data.names.map((resume, index) => `
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid ${resume.name === 'Your Name' ? '#f59e0b' : '#10b981'};">
+                    <div style="font-weight: bold; color: #1e293b;">${index + 1}. ${resume.name}</div>
+                    <div style="color: #64748b; font-size: 14px;">
+                        Role: ${resume.role} | Email: ${resume.email}<br>
+                        Created: ${new Date(resume.createdAt).toLocaleString()}<br>
+                        ID: ${resume.id}
+                    </div>
+                </div>
+            `).join('');
+
+            // Expected names check
+            const expectedNames = ['Purnima', 'manju', 'aarav', 'diya'];
+            const foundNames = data.names.map(n => n.name);
+            const checkResults = expectedNames.map(name => ({
+                name,
+                found: foundNames.includes(name)
+            }));
+
+            document.getElementById('namesContainer').innerHTML += `
+                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                    <h3 style="color: #1e293b; margin-bottom: 15px;">🔍 Expected Names Check:</h3>
+                    ${checkResults.map(result => `
+                        <div style="margin-bottom: 8px;">
+                            ${result.found ? '✅' : '❌'} <strong>${result.name}</strong>: ${result.found ? 'FOUND' : 'NOT FOUND'}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

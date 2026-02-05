@@ -13,11 +13,11 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Integrate ShareManager into existing ResumeBuilder class
   - _Requirements: 1.1, 1.2, 5.1, 5.2_
 
-- [ ]* 1.1 Write property test for URL generation and encoding
+- [ ] 1.1 Write property test for URL generation and encoding
   - **Property 1: Share URL Generation and Structure**
   - **Validates: Requirements 1.1, 5.1, 5.2**
 
-- [ ]* 1.2 Write property test for data round-trip integrity
+- [ ] 1.2 Write property test for data round-trip integrity
   - **Property 2: Resume Data Round-Trip Integrity**
   - **Validates: Requirements 1.2, 1.4, 1.5**
 
@@ -29,11 +29,11 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Modify header to show minimal branding in view mode
   - _Requirements: 2.1, 2.2, 2.3, 2.5, 7.1, 7.2, 7.3, 7.5_
 
-- [ ]* 2.1 Write property test for view mode activation
+- [ ] 2.1 Write property test for view mode activation
   - **Property 3: View Mode Activation**
   - **Validates: Requirements 1.3, 2.1**
 
-- [ ]* 2.2 Write property test for view mode UI state
+- [ ] 2.2 Write property test for view mode UI state
   - **Property 4: View Mode UI State**
   - **Validates: Requirements 2.2, 2.3, 2.5, 7.1, 7.2, 7.3**
 
@@ -45,15 +45,15 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Add transition from view mode to edit mode after duplication
   - _Requirements: 3.1, 3.2, 3.3, 3.5, 4.1, 4.2, 4.5_
 
-- [ ]* 3.1 Write property test for duplication integrity
+- [ ] 3.1 Write property test for duplication integrity
   - **Property 6: Resume Duplication Integrity**
   - **Validates: Requirements 3.1, 3.2, 3.3**
 
-- [ ]* 3.2 Write property test for copy independence
+- [ ] 3.2 Write property test for copy independence
   - **Property 7: Copy Independence**
   - **Validates: Requirements 3.5, 4.1, 4.2, 4.5**
 
-- [ ] 4. Enhance share modal with public link generation
+- [x] 4. Enhance share modal with public link generation
   - Add new "Generate Public Link" option to existing share modal HTML
   - Implement click handler for public link generation using ShareManager
   - Add copyable text field to display generated share URLs
@@ -61,11 +61,11 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Maintain existing file download and WhatsApp sharing options
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ]* 4.1 Write property test for share modal enhancement
+- [ ] 4.1 Write property test for share modal enhancement
   - **Property 11: Share Modal Enhancement**
   - **Validates: Requirements 6.1, 6.2, 6.3**
 
-- [ ] 5. Implement URL parsing and data loading system
+- [x] 5. Implement URL parsing and data loading system
   - Enhance existing loadFromURL method to handle share URL parameters
   - Add JSON validation for decoded resume data
   - Implement error handling for invalid or corrupted share URLs
@@ -73,11 +73,11 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Ensure all resume sections load correctly from shared URLs
   - _Requirements: 5.3, 5.4, 8.1, 8.2, 8.4, 8.5_
 
-- [ ]* 5.1 Write property test for data validation and error handling
+- [x] 5.1 Write property test for data validation and error handling
   - **Property 9: Data Validation and Error Handling**
   - **Validates: Requirements 5.3, 5.4, 8.1, 8.4**
 
-- [ ]* 5.2 Write property test for comprehensive data loading
+- [x] 5.2 Write property test for comprehensive data loading
   - **Property 10: Comprehensive Data Loading**
   - **Validates: Requirements 8.2, 8.5**
 
@@ -88,7 +88,7 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Update existing settings handling to work with new sharing system
   - _Requirements: 1.5, 2.4, 3.4, 8.3_
 
-- [ ]* 6.1 Write property test for visual settings preservation
+- [ ] 6.1 Write property test for visual settings preservation
   - **Property 5: Visual Settings Preservation**
   - **Validates: Requirements 2.4, 3.4, 8.3**
 
@@ -99,11 +99,11 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Handle large resume datasets with URL length management
   - _Requirements: 5.5, 9.1, 9.4, 9.5_
 
-- [ ]* 7.1 Write property test for browser compatibility
+- [ ] 7.1 Write property test for browser compatibility
   - **Property 12: Browser Compatibility**
   - **Validates: Requirements 9.1, 9.4, 9.5**
 
-- [ ]* 7.2 Write property test for large data handling
+- [ ] 7.2 Write property test for large data handling
   - **Property 13: Large Data Handling**
   - **Validates: Requirements 5.5**
 
@@ -114,7 +114,7 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Validate that copied resume files are completely independent
   - _Requirements: 4.3, 4.4_
 
-- [ ]* 8.1 Write property test for copy functionality equivalence
+- [ ] 8.1 Write property test for copy functionality equivalence
   - **Property 8: Copy Functionality Equivalence**
   - **Validates: Requirements 4.3, 4.4**
 
@@ -126,7 +126,7 @@ This implementation plan enhances the existing Resume Builder with share & dupli
   - Test error scenarios and edge cases across the entire system
   - _Requirements: All requirements integration_
 
-- [ ]* 9.1 Write integration tests for complete sharing workflow
+- [ ] 9.1 Write integration tests for complete sharing workflow
   - Test end-to-end sharing and duplication process
   - Verify cross-component integration works correctly
 
