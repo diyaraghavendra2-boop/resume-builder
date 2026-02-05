@@ -4,245 +4,408 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional Resume Builder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="resume-manager.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 24px;
+        }
+        
+        .auth-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .editor-panel, .preview-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .resume-preview {
+            border: 1px solid #ddd;
+            padding: 30px;
+            background: white;
+            min-height: 600px;
+        }
+        
+        .resume-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .resume-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .resume-role {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .resume-contact {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .resume-section {
+            margin-bottom: 25px;
+        }
+        
+        .resume-section h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .skill-tag {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .modal h3 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .message.success {
+            background: #28a745;
+        }
+        
+        .message.error {
+            background: #dc3545;
+        }
+        
+        .user-welcome {
+            color: white;
+            margin-right: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <!-- Header -->
-        <header class="app-header">
-            <h1>Professional Resume Builder</h1>
-            <div class="header-actions">
-                <button id="saveBtn" class="btn btn-primary">💾 Save Resume</button>
-                <button id="resetBtn" class="btn btn-secondary">🔄 Reset to Default</button>
-                <button id="exportBtn" class="btn btn-accent">📤 Export JSON</button>
-                <label for="importFile" class="btn btn-secondary">📥 Import JSON</label>
-                <input type="file" id="importFile" accept=".json" style="display: none;">
-                <button id="downloadPdfBtn" class="btn btn-primary">📄 Download PDF</button>
-                
-                <!-- Simple Authentication Section -->
-                <div style="margin-left: 20px; display: flex; gap: 10px; align-items: center;">
-                    <button onclick="showAuthModal('login')" class="btn btn-secondary" style="background: #28a745;">🔐 Login</button>
-                    <button onclick="showAuthModal('register')" class="btn btn-secondary" style="background: #17a2b8;">📝 Register</button>
-                    <span id="userWelcome" style="color: white; display: none;"></span>
-                    <button id="logoutBtn" onclick="logout()" class="btn btn-secondary" style="background: #dc3545; display: none;">🚪 Logout</button>
+        <div class="header">
+            <h1>🎯 Professional Resume Builder</h1>
+            <div class="auth-section">
+                <div id="authButtons">
+                    <button class="btn btn-primary" onclick="showModal('login')">🔐 Login</button>
+                    <button class="btn btn-secondary" onclick="showModal('register')">📝 Register</button>
+                </div>
+                <div id="userSection" style="display: none;">
+                    <span class="user-welcome" id="welcomeText"></span>
+                    <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
                 </div>
             </div>
-        </header>
+        </div>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <div class="main-content">
             <!-- Editor Panel -->
             <div class="editor-panel">
-                <!-- Header Section -->
-                <section class="editor-section">
-                    <h3>📋 Header Information</h3>
-                    <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" placeholder="John Doe">
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Professional Role</label>
-                        <input type="text" id="role" placeholder="Software Developer">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" placeholder="john.doe@email.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone</label>
-                            <input type="tel" id="phone" placeholder="(555) 123-4567">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="location">Location</label>
-                            <input type="text" id="location" placeholder="City, State">
-                        </div>
-                        <div class="form-group">
-                            <label for="linkedin">LinkedIn</label>
-                            <input type="text" id="linkedin" placeholder="linkedin.com/in/johndoe">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="website">Website/Portfolio</label>
-                        <input type="text" id="website" placeholder="johndoe.dev">
-                    </div>
-                    <div class="form-group">
-                        <label for="profilePicture">Profile Picture</label>
-                        <input type="file" id="profilePicture" accept="image/*">
-                        <div id="profilePreview" class="profile-preview"></div>
-                    </div>
-                </section>
-
-                <!-- Professional Summary -->
-                <section class="editor-section">
-                    <h3>📝 Professional Summary</h3>
-                    <div class="form-group">
-                        <textarea id="professionalSummary" rows="4" placeholder="Write a compelling professional summary that highlights your key strengths and career objectives..."></textarea>
-                    </div>
-                </section>
-
-                <!-- Skills -->
-                <section class="editor-section">
-                    <h3>🛠️ Skills</h3>
-                    <div class="form-group">
-                        <label for="skills">Skills (comma-separated)</label>
-                        <textarea id="skills" rows="3" placeholder="JavaScript, React, Node.js, Python, SQL, Git, AWS, Docker"></textarea>
-                    </div>
-                </section>
-
-                <!-- Experience -->
-                <section class="editor-section">
-                    <h3>💼 Work Experience</h3>
-                    <div id="experienceContainer"></div>
-                    <button type="button" class="btn add-btn" onclick="addExperience()">+ Add Experience</button>
-                </section>
-
-                <!-- Certifications -->
-                <section class="editor-section">
-                    <h3>🏆 Certifications</h3>
-                    <div id="certificationsContainer"></div>
-                    <button type="button" class="btn add-btn" onclick="addCertification()">+ Add Certification</button>
-                </section>
-
-                <!-- Education -->
-                <section class="editor-section">
-                    <h3>🎓 Education</h3>
-                    <div id="educationContainer"></div>
-                    <button type="button" class="btn add-btn" onclick="addEducation()">+ Add Education</button>
-                </section>
-
-                <!-- Hobbies -->
-                <section class="editor-section">
-                    <h3>🎯 Hobbies & Interests</h3>
-                    <div class="form-group">
-                        <label for="hobbies">Hobbies (comma-separated)</label>
-                        <textarea id="hobbies" rows="2" placeholder="Reading, Photography, Hiking, Coding"></textarea>
-                    </div>
-                </section>
+                <h2>📝 Edit Your Resume</h2>
+                
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="John Doe" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobTitle">Job Title</label>
+                    <input type="text" id="jobTitle" placeholder="Software Developer" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="john.doe@email.com" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" placeholder="(555) 123-4567" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="summary">Professional Summary</label>
+                    <textarea id="summary" placeholder="Write a compelling professional summary..." onchange="updatePreview()"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="skills">Skills (comma-separated)</label>
+                    <textarea id="skills" placeholder="JavaScript, React, Node.js, Python, SQL" onchange="updatePreview()"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="experience">Work Experience</label>
+                    <textarea id="experience" placeholder="Senior Developer at Tech Company (2020-Present)&#10;- Led development of web applications&#10;- Collaborated with cross-functional teams" onchange="updatePreview()"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="education">Education</label>
+                    <textarea id="education" placeholder="Bachelor of Computer Science&#10;University Name (2018)" onchange="updatePreview()"></textarea>
+                </div>
+                
+                <button class="btn btn-primary" onclick="saveResume()" style="width: 100%; margin-top: 20px;">💾 Save Resume</button>
             </div>
 
             <!-- Preview Panel -->
             <div class="preview-panel">
-                <div id="resumePreview" class="resume-preview">
-                    <!-- Resume Header -->
+                <h2>👁️ Live Preview</h2>
+                <div class="resume-preview" id="resumePreview">
                     <div class="resume-header">
-                        <div class="header-content">
-                            <div class="profile-section">
-                                <div class="profile-image-container">
-                                    <img id="previewProfilePicture" class="profile-image" style="display: none;" alt="Profile Picture">
-                                </div>
-                                <div class="header-text">
-                                    <h1 id="previewName">Your Name</h1>
-                                    <h2 id="previewRole">Your Professional Role</h2>
-                                </div>
-                            </div>
-                            <div class="contact-info">
-                                <span id="previewEmail">your@email.com</span>
-                                <span id="previewPhone">(555) 123-4567</span>
-                                <span id="previewLocation">City, State</span>
-                                <span id="previewLinkedin">linkedin.com/in/yourprofile</span>
-                                <span id="previewWebsite">yourwebsite.com</span>
-                            </div>
+                        <div class="resume-name" id="previewName">Your Name</div>
+                        <div class="resume-role" id="previewRole">Your Job Title</div>
+                        <div class="resume-contact">
+                            <span id="previewEmail">your.email@example.com</span> • 
+                            <span id="previewPhone">(555) 123-4567</span>
                         </div>
                     </div>
-
-                    <!-- Resume Body -->
-                    <div class="resume-body">
-                        <!-- Professional Summary -->
-                        <div class="resume-section">
-                            <h3>Professional Summary</h3>
-                            <p id="previewSummary">Your professional summary will appear here...</p>
+                    
+                    <div class="resume-section">
+                        <h3>Professional Summary</h3>
+                        <p id="previewSummary">Your professional summary will appear here...</p>
+                    </div>
+                    
+                    <div class="resume-section">
+                        <h3>Skills</h3>
+                        <div class="skills-list" id="previewSkills">
+                            <span class="skill-tag">Add your skills</span>
                         </div>
-
-                        <!-- Skills -->
-                        <div class="resume-section">
-                            <h3>Skills</h3>
-                            <div id="previewSkills" class="skills-grid"></div>
-                        </div>
-
-                        <!-- Experience -->
-                        <div class="resume-section">
-                            <h3>Work Experience</h3>
-                            <div id="previewExperience"></div>
-                        </div>
-
-                        <!-- Certifications -->
-                        <div class="resume-section">
-                            <h3>Certifications</h3>
-                            <div id="previewCertifications"></div>
-                        </div>
-
-                        <!-- Education -->
-                        <div class="resume-section">
-                            <h3>Education</h3>
-                            <div id="previewEducation"></div>
-                        </div>
-
-                        <!-- Hobbies -->
-                        <div class="resume-section">
-                            <h3>Hobbies & Interests</h3>
-                            <div id="previewHobbies" class="hobbies-grid"></div>
-                        </div>
+                    </div>
+                    
+                    <div class="resume-section">
+                        <h3>Experience</h3>
+                        <div id="previewExperience">Your work experience will appear here...</div>
+                    </div>
+                    
+                    <div class="resume-section">
+                        <h3>Education</h3>
+                        <div id="previewEducation">Your education details will appear here...</div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h3>🔐 Login</h3>
+            <div class="form-group">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="loginPassword" placeholder="Password" required>
+            </div>
+            <button class="btn btn-primary" onclick="handleLogin()" style="width: 100%; margin-bottom: 10px;">Login</button>
+            <button class="btn btn-secondary" onclick="closeModal()" style="width: 100%;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h3>📝 Register</h3>
+            <div class="form-group">
+                <input type="text" id="registerName" placeholder="Full Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="registerEmail" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="registerPassword" placeholder="Password (min 6 chars)" required>
+            </div>
+            <button class="btn btn-primary" onclick="handleRegister()" style="width: 100%; margin-bottom: 10px;">Register</button>
+            <button class="btn btn-secondary" onclick="closeModal()" style="width: 100%;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Message -->
+    <div id="message" class="message"></div>
+
     <script>
-        // Inline configuration to avoid loading issues
-        window.RESUME_BUILDER_CONFIG = {
-            API_BASE: 'https://resume-indol-sigma.vercel.app/api',
-            isProduction: true
-        };
-    </script>
-    <script src="config.js"></script>
-    <script>
-        // Simple Authentication Functions
-        const API_BASE = window.RESUME_BUILDER_CONFIG ? window.RESUME_BUILDER_CONFIG.API_BASE : 'http://localhost:5001/api';
+        // Configuration
+        const API_BASE = 'https://resume-indol-sigma.vercel.app/api';
         let currentUser = null;
         let authToken = localStorage.getItem('authToken');
 
-        // Check if user is logged in on page load
+        // Initialize app
         window.onload = function() {
             if (authToken) {
                 getCurrentUser();
             }
+            loadSampleData();
+            updatePreview();
         };
 
-        function showAuthModal(type) {
-            const isLogin = type === 'login';
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-                z-index: 1000;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 90%;">
-                    <h3 style="margin-bottom: 20px; text-align: center;">${isLogin ? '🔐 Login' : '📝 Register'}</h3>
-                    ${!isLogin ? '<input type="text" id="modalName" placeholder="Full Name" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">' : ''}
-                    <input type="email" id="modalEmail" placeholder="Email" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
-                    <input type="password" id="modalPassword" placeholder="Password" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                    <button onclick="${isLogin ? 'handleLogin' : 'handleRegister'}()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 10px;">${isLogin ? 'Login' : 'Register'}</button>
-                    <button onclick="this.closest('div').parentNode.remove()" style="width: 100%; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
+        // Authentication functions
+        function showModal(type) {
+            closeModal();
+            document.getElementById(type + 'Modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('registerModal').style.display = 'none';
         }
 
         async function handleLogin() {
-            const email = document.getElementById('modalEmail').value;
-            const password = document.getElementById('modalPassword').value;
-            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
             if (!email || !password) {
-                alert('Please fill in all fields');
+                showMessage('Please fill in all fields', 'error');
                 return;
             }
 
@@ -252,30 +415,36 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     authToken = data.data.token;
                     currentUser = data.data.user;
                     localStorage.setItem('authToken', authToken);
-                    alert('✅ Login successful!');
-                    updateUI();
-                    document.querySelector('div[style*="position: fixed"]').remove();
+                    showMessage('✅ Login successful!', 'success');
+                    updateAuthUI();
+                    closeModal();
                 } else {
-                    alert('❌ ' + data.message);
+                    showMessage('❌ ' + data.message, 'error');
                 }
             } catch (error) {
-                alert('❌ Login failed: ' + error.message);
+                showMessage('❌ Login failed: ' + error.message, 'error');
             }
         }
 
         async function handleRegister() {
-            const name = document.getElementById('modalName').value;
-            const email = document.getElementById('modalEmail').value;
-            const password = document.getElementById('modalPassword').value;
-            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
             if (!name || !email || !password) {
-                alert('Please fill in all fields');
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
                 return;
             }
 
@@ -285,20 +454,21 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
                 });
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     authToken = data.data.token;
                     currentUser = data.data.user;
                     localStorage.setItem('authToken', authToken);
-                    alert('✅ Registration successful!');
-                    updateUI();
-                    document.querySelector('div[style*="position: fixed"]').remove();
+                    showMessage('✅ Registration successful!', 'success');
+                    updateAuthUI();
+                    closeModal();
                 } else {
-                    alert('❌ ' + data.message);
+                    showMessage('❌ ' + data.message, 'error');
                 }
             } catch (error) {
-                alert('❌ Registration failed: ' + error.message);
+                showMessage('❌ Registration failed: ' + error.message, 'error');
             }
         }
 
@@ -307,13 +477,20 @@
                 const response = await fetch(`${API_BASE}/auth/me`, {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
+
                 const data = await response.json();
+
                 if (data.success) {
                     currentUser = data.data.user;
-                    updateUI();
+                    updateAuthUI();
+                } else {
+                    localStorage.removeItem('authToken');
+                    authToken = null;
                 }
             } catch (error) {
                 console.error('Failed to get current user:', error);
+                localStorage.removeItem('authToken');
+                authToken = null;
             }
         }
 
@@ -321,24 +498,140 @@
             authToken = null;
             currentUser = null;
             localStorage.removeItem('authToken');
-            updateUI();
-            alert('✅ Logged out successfully');
+            updateAuthUI();
+            showMessage('✅ Logged out successfully', 'success');
         }
 
-        function updateUI() {
-            const welcome = document.getElementById('userWelcome');
-            const logoutBtn = document.getElementById('logoutBtn');
-            
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            const userSection = document.getElementById('userSection');
+            const welcomeText = document.getElementById('welcomeText');
+
             if (currentUser) {
-                welcome.textContent = `Welcome, ${currentUser.name}!`;
-                welcome.style.display = 'inline';
-                logoutBtn.style.display = 'inline';
+                authButtons.style.display = 'none';
+                userSection.style.display = 'flex';
+                welcomeText.textContent = `Welcome, ${currentUser.name}!`;
             } else {
-                welcome.style.display = 'none';
-                logoutBtn.style.display = 'none';
+                authButtons.style.display = 'flex';
+                userSection.style.display = 'none';
             }
         }
+
+        // Resume functions
+        async function saveResume() {
+            if (!currentUser) {
+                showMessage('Please login to save your resume', 'error');
+                showModal('login');
+                return;
+            }
+
+            const resumeData = {
+                title: 'My Resume',
+                header: {
+                    name: document.getElementById('fullName').value || 'Your Name',
+                    role: document.getElementById('jobTitle').value || 'Your Job Title',
+                    email: document.getElementById('email').value || '',
+                    phone: document.getElementById('phone').value || ''
+                },
+                professionalSummary: document.getElementById('summary').value || '',
+                skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(s => s),
+                experience: [{ description: document.getElementById('experience').value || '' }],
+                education: [{ description: document.getElementById('education').value || '' }]
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/resume`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(resumeData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('✅ Resume saved successfully!', 'success');
+                } else {
+                    showMessage('❌ Failed to save: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Save failed: ' + error.message, 'error');
+            }
+        }
+
+        function updatePreview() {
+            document.getElementById('previewName').textContent = 
+                document.getElementById('fullName').value || 'Your Name';
+            
+            document.getElementById('previewRole').textContent = 
+                document.getElementById('jobTitle').value || 'Your Job Title';
+            
+            document.getElementById('previewEmail').textContent = 
+                document.getElementById('email').value || 'your.email@example.com';
+            
+            document.getElementById('previewPhone').textContent = 
+                document.getElementById('phone').value || '(555) 123-4567';
+            
+            document.getElementById('previewSummary').textContent = 
+                document.getElementById('summary').value || 'Your professional summary will appear here...';
+            
+            // Update skills
+            const skillsText = document.getElementById('skills').value;
+            const skillsContainer = document.getElementById('previewSkills');
+            
+            if (skillsText.trim()) {
+                const skills = skillsText.split(',').map(s => s.trim()).filter(s => s);
+                skillsContainer.innerHTML = skills.map(skill => 
+                    `<span class="skill-tag">${skill}</span>`
+                ).join('');
+            } else {
+                skillsContainer.innerHTML = '<span class="skill-tag">Add your skills</span>';
+            }
+            
+            document.getElementById('previewExperience').innerHTML = 
+                (document.getElementById('experience').value || 'Your work experience will appear here...').replace(/\n/g, '<br>');
+            
+            document.getElementById('previewEducation').innerHTML = 
+                (document.getElementById('education').value || 'Your education details will appear here...').replace(/\n/g, '<br>');
+        }
+
+        function loadSampleData() {
+            document.getElementById('fullName').value = 'John Doe';
+            document.getElementById('jobTitle').value = 'Software Developer';
+            document.getElementById('email').value = 'john.doe@email.com';
+            document.getElementById('phone').value = '(555) 123-4567';
+            document.getElementById('summary').value = 'Experienced software developer with 5+ years of expertise in full-stack development. Passionate about creating efficient, scalable solutions and collaborating with cross-functional teams to deliver high-quality products.';
+            document.getElementById('skills').value = 'JavaScript, React, Node.js, Python, SQL, Git, AWS, Docker';
+            document.getElementById('experience').value = 'Senior Software Developer\nTech Company Inc. (2021 - Present)\n• Lead development of web applications using React and Node.js\n• Collaborated with product teams to implement new features\n• Improved application performance by 40%\n\nSoftware Developer\nStartUp Solutions (2019 - 2021)\n• Developed and maintained multiple client projects\n• Worked with databases and API integrations';
+            document.getElementById('education').value = 'Bachelor of Computer Science\nUniversity of Technology (2019)\n• Graduated Magna Cum Laude\n• Relevant coursework: Data Structures, Algorithms, Software Engineering';
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 4000);
+        }
+
+        // Test API connection on load
+        fetch(`${API_BASE}/health`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    console.log('✅ Backend API connected successfully');
+                } else {
+                    console.log('⚠️ Backend API connection issue');
+                }
+            })
+            .catch(error => {
+                console.log('❌ Cannot connect to backend API:', error);
+            });
     </script>
-    <script src="script.js"></script>
 </body>
 </html>
