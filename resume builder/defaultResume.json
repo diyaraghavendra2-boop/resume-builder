@@ -1,0 +1,78 @@
+{
+  "personal": {
+    "fullName": "Your Name",
+    "title": "Professional Title",
+    "email": "your.email@example.com",
+    "phone": "+1 (555) 123-4567",
+    "location": "City, State"
+  },
+  "summary": "A motivated professional with experience in [your field]. Skilled in [key skills] and passionate about [your interests]. Looking to contribute to a dynamic team and grow professionally.",
+  "experience": [
+    {
+      "jobTitle": "Job Title",
+      "company": "Company Name",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "description": "• Describe your key responsibilities and achievements\n• Use bullet points to highlight your impact\n• Include metrics and results where possible\n• Focus on skills relevant to your target role"
+    },
+    {
+      "jobTitle": "Previous Job Title",
+      "company": "Previous Company",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "description": "• Another role with key accomplishments\n• Demonstrate career progression\n• Show increasing responsibility\n• Highlight transferable skills"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Degree Name",
+      "school": "University/School Name",
+      "gradYear": "Graduation Year",
+      "gpa": "GPA (optional)"
+    }
+  ],
+  "skills": [
+    { "name": "Technical Skill 1", "level": "Advanced" },
+    { "name": "Technical Skill 2", "level": "Intermediate" },
+    { "name": "Soft Skill 1", "level": "Expert" },
+    { "name": "Soft Skill 2", "level": "Advanced" },
+    { "name": "Industry Tool", "level": "Intermediate" },
+    { "name": "Programming Language", "level": "Advanced" }
+  ],
+  "projects": [
+    {
+      "name": "Project Name",
+      "description": "Brief description of the project, technologies used, and your role. Highlight the impact and results achieved.",
+      "link": ""
+    },
+    {
+      "name": "Another Project",
+      "description": "Description of another significant project that demonstrates your skills and experience.",
+      "link": ""
+    }
+  ],
+  "social": {
+    "linkedin": "",
+    "github": "",
+    "portfolio": ""
+  },
+  "certifications": [
+    "Relevant Certification 1",
+    "Professional Certification 2"
+  ],
+  "languages": [
+    "English (Native)",
+    "Second Language (Proficiency Level)"
+  ],
+  "hobbies": [
+    "Professional Interest 1",
+    "Hobby or Interest 2",
+    "Volunteer Activity"
+  ],
+  "settings": {
+    "template": "minimal",
+    "primaryColor": "#2563eb",
+    "fontFamily": "Inter",
+    "isDarkTheme": false
+  }
+}
