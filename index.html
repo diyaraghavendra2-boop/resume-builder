@@ -186,10 +186,217 @@
     </div>
 
     <script src="config.js"></script>
-    <script src="script-with-backend.js"></script>
     <script>
-        // Initialize the resume builder with backend authentication
-        const resumeBuilder = new ResumeBuilderWithBackend();
+        // Simple Authentication System for Resume Builder
+        class SimpleAuth {
+            constructor() {
+                this.apiBaseUrl = window.RESUME_BUILDER_CONFIG ? window.RESUME_BUILDER_CONFIG.API_BASE : 'http://localhost:5001/api';
+                this.authToken = localStorage.getItem('authToken');
+                this.currentUser = null;
+                this.init();
+            }
+
+            async init() {
+                if (this.authToken) {
+                    await this.getCurrentUser();
+                }
+                this.renderAuthUI();
+            }
+
+            async register(name, email, password) {
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password })
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.authToken = data.data.token;
+                        this.currentUser = data.data.user;
+                        localStorage.setItem('authToken', this.authToken);
+                        this.showMessage('Registration successful!', 'success');
+                        this.renderAuthUI();
+                    } else {
+                        this.showMessage(data.message, 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('Registration failed. Please try again.', 'error');
+                }
+            }
+
+            async login(email, password) {
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.authToken = data.data.token;
+                        this.currentUser = data.data.user;
+                        localStorage.setItem('authToken', this.authToken);
+                        this.showMessage('Login successful!', 'success');
+                        this.renderAuthUI();
+                    } else {
+                        this.showMessage(data.message, 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('Login failed. Please try again.', 'error');
+                }
+            }
+
+            logout() {
+                this.authToken = null;
+                this.currentUser = null;
+                localStorage.removeItem('authToken');
+                this.renderAuthUI();
+                this.showMessage('Logged out successfully', 'info');
+            }
+
+            async getCurrentUser() {
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/auth/me`, {
+                        headers: { 'Authorization': `Bearer ${this.authToken}` }
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        this.currentUser = data.data.user;
+                    }
+                } catch (error) {
+                    console.error('Failed to get current user:', error);
+                }
+            }
+
+            renderAuthUI() {
+                const headerActions = document.querySelector('.header-actions');
+                if (!headerActions) return;
+                
+                // Remove existing auth UI
+                const existingAuth = document.getElementById('authUI');
+                if (existingAuth) existingAuth.remove();
+                
+                const authDiv = document.createElement('div');
+                authDiv.id = 'authUI';
+                authDiv.style.marginLeft = 'auto';
+                
+                if (this.currentUser) {
+                    authDiv.innerHTML = `
+                        <span style="color: white; margin-right: 10px;">Welcome, ${this.currentUser.name}!</span>
+                        <button onclick="auth.logout()" class="btn btn-secondary">Logout</button>
+                    `;
+                } else {
+                    authDiv.innerHTML = `
+                        <button onclick="auth.showLoginModal()" class="btn btn-secondary">Login</button>
+                        <button onclick="auth.showRegisterModal()" class="btn btn-secondary">Register</button>
+                    `;
+                }
+                
+                headerActions.appendChild(authDiv);
+            }
+
+            showLoginModal() {
+                const modal = this.createModal('Login', `
+                    <div class="form-group">
+                        <input type="email" id="loginEmail" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                    </div>
+                    <button onclick="auth.handleLogin()" class="btn btn-primary">Login</button>
+                `);
+                document.body.appendChild(modal);
+            }
+
+            showRegisterModal() {
+                const modal = this.createModal('Register', `
+                    <div class="form-group">
+                        <input type="text" id="registerName" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="registerEmail" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="registerPassword" placeholder="Password (min 6 chars)" required>
+                    </div>
+                    <button onclick="auth.handleRegister()" class="btn btn-primary">Register</button>
+                `);
+                document.body.appendChild(modal);
+            }
+
+            createModal(title, content) {
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+                    z-index: 1000;
+                `;
+                
+                modal.innerHTML = `
+                    <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 90%;">
+                        <h3 style="margin-bottom: 20px;">${title}</h3>
+                        ${content}
+                        <button onclick="this.closest('.modal').remove()" class="btn btn-secondary" style="margin-top: 15px;">Cancel</button>
+                    </div>
+                `;
+                
+                return modal;
+            }
+
+            async handleLogin() {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                if (!email || !password) {
+                    this.showMessage('Please fill in all fields', 'warning');
+                    return;
+                }
+                
+                await this.login(email, password);
+                const modal = document.querySelector('.modal');
+                if (modal) modal.remove();
+            }
+
+            async handleRegister() {
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                
+                if (!name || !email || !password) {
+                    this.showMessage('Please fill in all fields', 'warning');
+                    return;
+                }
+                
+                await this.register(name, email, password);
+                const modal = document.querySelector('.modal');
+                if (modal) modal.remove();
+            }
+
+            showMessage(message, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; padding: 15px 20px;
+                    border-radius: 5px; color: white; z-index: 1001; max-width: 300px;
+                    background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#ffc107'};
+                `;
+                messageDiv.textContent = message;
+                document.body.appendChild(messageDiv);
+                
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 3000);
+            }
+        }
+
+        // Initialize authentication system
+        const auth = new SimpleAuth();
     </script>
+    <script src="script.js"></script>
 </body>
 </html>
