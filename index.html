@@ -20,6 +20,16 @@
                 <label for="importFile" class="btn btn-secondary">📥 Import JSON</label>
                 <input type="file" id="importFile" accept=".json" style="display: none;">
                 <button id="downloadPdfBtn" class="btn btn-primary">📄 Download PDF</button>
+                
+                <!-- Authentication Buttons -->
+                <div id="authButtons" style="margin-left: 20px;">
+                    <button id="loginBtn" class="btn btn-secondary">🔐 Login</button>
+                    <button id="registerBtn" class="btn btn-secondary">📝 Register</button>
+                </div>
+                <div id="userInfo" style="margin-left: 20px; display: none;">
+                    <span id="welcomeText" style="color: white; margin-right: 10px;"></span>
+                    <button id="logoutBtn" class="btn btn-secondary">🚪 Logout</button>
+                </div>
             </div>
         </header>
 
@@ -200,7 +210,29 @@
                 if (this.authToken) {
                     await this.getCurrentUser();
                 }
-                this.renderAuthUI();
+                this.setupEventListeners();
+                this.updateUI();
+            }
+
+            setupEventListeners() {
+                document.getElementById('loginBtn').addEventListener('click', () => this.showLoginModal());
+                document.getElementById('registerBtn').addEventListener('click', () => this.showRegisterModal());
+                document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+            }
+
+            updateUI() {
+                const authButtons = document.getElementById('authButtons');
+                const userInfo = document.getElementById('userInfo');
+                const welcomeText = document.getElementById('welcomeText');
+
+                if (this.currentUser) {
+                    authButtons.style.display = 'none';
+                    userInfo.style.display = 'block';
+                    welcomeText.textContent = `Welcome, ${this.currentUser.name}!`;
+                } else {
+                    authButtons.style.display = 'block';
+                    userInfo.style.display = 'none';
+                }
             }
 
             async register(name, email, password) {
@@ -217,7 +249,7 @@
                         this.currentUser = data.data.user;
                         localStorage.setItem('authToken', this.authToken);
                         this.showMessage('Registration successful!', 'success');
-                        this.renderAuthUI();
+                        this.updateUI();
                     } else {
                         this.showMessage(data.message, 'error');
                     }
@@ -240,7 +272,7 @@
                         this.currentUser = data.data.user;
                         localStorage.setItem('authToken', this.authToken);
                         this.showMessage('Login successful!', 'success');
-                        this.renderAuthUI();
+                        this.updateUI();
                     } else {
                         this.showMessage(data.message, 'error');
                     }
@@ -253,7 +285,7 @@
                 this.authToken = null;
                 this.currentUser = null;
                 localStorage.removeItem('authToken');
-                this.renderAuthUI();
+                this.updateUI();
                 this.showMessage('Logged out successfully', 'info');
             }
 
@@ -271,65 +303,38 @@
                 }
             }
 
-            renderAuthUI() {
-                const headerActions = document.querySelector('.header-actions');
-                if (!headerActions) return;
-                
-                // Remove existing auth UI
-                const existingAuth = document.getElementById('authUI');
-                if (existingAuth) existingAuth.remove();
-                
-                const authDiv = document.createElement('div');
-                authDiv.id = 'authUI';
-                authDiv.style.marginLeft = 'auto';
-                
-                if (this.currentUser) {
-                    authDiv.innerHTML = `
-                        <span style="color: white; margin-right: 10px;">Welcome, ${this.currentUser.name}!</span>
-                        <button onclick="auth.logout()" class="btn btn-secondary">Logout</button>
-                    `;
-                } else {
-                    authDiv.innerHTML = `
-                        <button onclick="auth.showLoginModal()" class="btn btn-secondary">Login</button>
-                        <button onclick="auth.showRegisterModal()" class="btn btn-secondary">Register</button>
-                    `;
-                }
-                
-                headerActions.appendChild(authDiv);
-            }
-
             showLoginModal() {
                 const modal = this.createModal('Login', `
-                    <div class="form-group">
-                        <input type="email" id="loginEmail" placeholder="Email" required>
+                    <div style="margin-bottom: 15px;">
+                        <input type="email" id="loginEmail" placeholder="Email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                     </div>
-                    <div class="form-group">
-                        <input type="password" id="loginPassword" placeholder="Password" required>
+                    <div style="margin-bottom: 15px;">
+                        <input type="password" id="loginPassword" placeholder="Password" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                     </div>
-                    <button onclick="auth.handleLogin()" class="btn btn-primary">Login</button>
+                    <button onclick="auth.handleLogin()" class="btn btn-primary" style="width: 100%; padding: 10px;">Login</button>
                 `);
                 document.body.appendChild(modal);
             }
 
             showRegisterModal() {
                 const modal = this.createModal('Register', `
-                    <div class="form-group">
-                        <input type="text" id="registerName" placeholder="Full Name" required>
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" id="registerName" placeholder="Full Name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                     </div>
-                    <div class="form-group">
-                        <input type="email" id="registerEmail" placeholder="Email" required>
+                    <div style="margin-bottom: 15px;">
+                        <input type="email" id="registerEmail" placeholder="Email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                     </div>
-                    <div class="form-group">
-                        <input type="password" id="registerPassword" placeholder="Password (min 6 chars)" required>
+                    <div style="margin-bottom: 15px;">
+                        <input type="password" id="registerPassword" placeholder="Password (min 6 chars)" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                     </div>
-                    <button onclick="auth.handleRegister()" class="btn btn-primary">Register</button>
+                    <button onclick="auth.handleRegister()" class="btn btn-primary" style="width: 100%; padding: 10px;">Register</button>
                 `);
                 document.body.appendChild(modal);
             }
 
             createModal(title, content) {
                 const modal = document.createElement('div');
-                modal.className = 'modal';
+                modal.className = 'auth-modal';
                 modal.style.cssText = `
                     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                     background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
@@ -337,10 +342,10 @@
                 `;
                 
                 modal.innerHTML = `
-                    <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 90%;">
-                        <h3 style="margin-bottom: 20px;">${title}</h3>
+                    <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 90%; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 20px; text-align: center; color: #333;">${title}</h3>
                         ${content}
-                        <button onclick="this.closest('.modal').remove()" class="btn btn-secondary" style="margin-top: 15px;">Cancel</button>
+                        <button onclick="this.closest('.auth-modal').remove()" style="width: 100%; padding: 10px; margin-top: 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
                     </div>
                 `;
                 
@@ -357,7 +362,7 @@
                 }
                 
                 await this.login(email, password);
-                const modal = document.querySelector('.modal');
+                const modal = document.querySelector('.auth-modal');
                 if (modal) modal.remove();
             }
 
@@ -372,7 +377,7 @@
                 }
                 
                 await this.register(name, email, password);
-                const modal = document.querySelector('.modal');
+                const modal = document.querySelector('.auth-modal');
                 if (modal) modal.remove();
             }
 
@@ -382,6 +387,7 @@
                     position: fixed; top: 20px; right: 20px; padding: 15px 20px;
                     border-radius: 5px; color: white; z-index: 1001; max-width: 300px;
                     background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#ffc107'};
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
                 `;
                 messageDiv.textContent = message;
                 document.body.appendChild(messageDiv);
@@ -394,8 +400,10 @@
             }
         }
 
-        // Initialize authentication system
-        const auth = new SimpleAuth();
+        // Initialize authentication system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            window.auth = new SimpleAuth();
+        });
     </script>
     <script src="script.js"></script>
 </body>
