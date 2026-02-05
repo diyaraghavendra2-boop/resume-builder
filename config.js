@@ -4,7 +4,7 @@ const CONFIG = {
         API_BASE: 'http://localhost:5001/api'
     },
     production: {
-        API_BASE: 'https://your-backend.vercel.app/api' // Will be updated after backend deployment
+        API_BASE: 'https://resume-indol-sigma.vercel.app/api' // Updated with actual Vercel URL
     }
 };
 
