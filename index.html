@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎯 Professional Resume Builder - Live Version</title>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -310,6 +311,11 @@
                     <textarea id="education" placeholder="Bachelor of Computer Science&#10;University Name (2018)" onchange="updatePreview()"></textarea>
                 </div>
                 
+                <div class="form-group">
+                    <label for="hobbies">Hobbies & Interests (comma-separated)</label>
+                    <textarea id="hobbies" placeholder="Reading, Photography, Hiking, Coding, Travel" onchange="updatePreview()"></textarea>
+                </div>
+                
                 <button class="btn btn-primary" onclick="saveResume()" style="width: 100%; margin-top: 20px;">💾 Save Resume</button>
             </div>
 
@@ -346,6 +352,13 @@
                     <div class="resume-section">
                         <h3>Education</h3>
                         <div id="previewEducation">Your education details will appear here...</div>
+                    </div>
+                    
+                    <div class="resume-section">
+                        <h3>Hobbies & Interests</h3>
+                        <div class="skills-list" id="previewHobbies">
+                            <span class="skill-tag">Add your hobbies</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -390,9 +403,9 @@
 
     <script>
         // Configuration - Connect to backend API
-        const API_BASE = window.location.hostname === 'localhost' 
-            ? 'http://localhost:5001/api' 
-            : window.location.origin + '/api';
+        const API_BASE = window.RESUME_BUILDER_CONFIG 
+            ? window.RESUME_BUILDER_CONFIG.API_BASE 
+            : 'http://localhost:5001/api';
         
         let currentUser = null;
         let authToken = localStorage.getItem('authToken');
@@ -557,13 +570,19 @@
                 professionalSummary: document.getElementById('summary').value || '',
                 skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(s => s),
                 experience: [{ 
-                    company: 'Experience',
-                    description: document.getElementById('experience').value || '' 
+                    title: 'Software Developer',
+                    company: 'Tech Company',
+                    startDate: '2020',
+                    endDate: 'Present',
+                    description: document.getElementById('experience').value || 'Work experience details' 
                 }],
                 education: [{ 
-                    degree: 'Education',
-                    description: document.getElementById('education').value || '' 
-                }]
+                    degree: 'Bachelor of Computer Science',
+                    school: 'University Name',
+                    year: '2019',
+                    location: 'City, State'
+                }],
+                hobbies: document.getElementById('hobbies').value.split(',').map(s => s.trim()).filter(s => s)
             };
 
             try {
@@ -623,6 +642,19 @@
             
             document.getElementById('previewEducation').innerHTML = 
                 (document.getElementById('education').value || 'Your education details will appear here...').replace(/\n/g, '<br>');
+            
+            // Update hobbies
+            const hobbiesText = document.getElementById('hobbies').value;
+            const hobbiesContainer = document.getElementById('previewHobbies');
+            
+            if (hobbiesText.trim()) {
+                const hobbies = hobbiesText.split(',').map(s => s.trim()).filter(s => s);
+                hobbiesContainer.innerHTML = hobbies.map(hobby => 
+                    `<span class="skill-tag">${hobby}</span>`
+                ).join('');
+            } else {
+                hobbiesContainer.innerHTML = '<span class="skill-tag">Add your hobbies</span>';
+            }
         }
 
         function loadSampleData() {
@@ -634,6 +666,7 @@
             document.getElementById('skills').value = 'JavaScript, React, Node.js, Python, SQL, Git, AWS, Docker';
             document.getElementById('experience').value = 'Senior Software Developer\nTech Company Inc. (2021 - Present)\n• Lead development of web applications using React and Node.js\n• Collaborated with product teams to implement new features\n• Improved application performance by 40%\n\nSoftware Developer\nStartUp Solutions (2019 - 2021)\n• Developed and maintained multiple client projects\n• Worked with databases and API integrations';
             document.getElementById('education').value = 'Bachelor of Computer Science\nUniversity of Technology (2019)\n• Graduated Magna Cum Laude\n• Relevant coursework: Data Structures, Algorithms, Software Engineering';
+            document.getElementById('hobbies').value = 'Reading, Photography, Hiking, Coding, Open Source Contribution';
         }
 
         function showMessage(text, type) {
