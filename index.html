@@ -414,6 +414,8 @@
         window.onload = function() {
             if (authToken) {
                 getCurrentUser();
+            } else {
+                updateAuthUI(); // Show login/register buttons if not logged in
             }
             loadSampleData();
             updatePreview();
@@ -520,11 +522,15 @@
                 } else {
                     localStorage.removeItem('authToken');
                     authToken = null;
+                    currentUser = null;
+                    updateAuthUI();
                 }
             } catch (error) {
                 console.error('Failed to get current user:', error);
                 localStorage.removeItem('authToken');
                 authToken = null;
+                currentUser = null;
+                updateAuthUI();
             }
         }
 
