@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎯 Professional Resume Builder - Live Version</title>
+    <title>Professional Resume Builder</title>
     <style>
         * {
             margin: 0;
@@ -221,15 +221,6 @@
             margin-right: 15px;
         }
         
-        .status-banner {
-            background: #28a745;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -244,11 +235,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Status Banner -->
-        <div class="status-banner">
-            ✅ Resume Builder connected to MongoDB Atlas Cloud! Register or login to save your resumes.
-        </div>
-
         <!-- Header -->
         <div class="header">
             <h1>🎯 Professional Resume Builder</h1>
@@ -389,11 +375,8 @@
     <div id="message" class="message"></div>
 
     <script>
-        // Configuration - Connect to backend API
-        const API_BASE = window.location.hostname === 'localhost' 
-            ? 'http://localhost:5001/api' 
-            : window.location.origin + '/api';
-        
+        // Configuration
+        const API_BASE = 'https://resume-indol-sigma.vercel.app/api';
         let currentUser = null;
         let authToken = localStorage.getItem('authToken');
 
@@ -404,8 +387,6 @@
             }
             loadSampleData();
             updatePreview();
-            console.log('✅ Resume Builder loaded successfully!');
-            console.log('🔗 API Base:', API_BASE);
         };
 
         // Authentication functions
@@ -449,7 +430,6 @@
                 }
             } catch (error) {
                 showMessage('❌ Login failed: ' + error.message, 'error');
-                console.error('Login error:', error);
             }
         }
 
@@ -489,7 +469,6 @@
                 }
             } catch (error) {
                 showMessage('❌ Registration failed: ' + error.message, 'error');
-                console.error('Registration error:', error);
             }
         }
 
@@ -547,7 +526,7 @@
             }
 
             const resumeData = {
-                title: document.getElementById('fullName').value + "'s Resume",
+                title: 'My Resume',
                 header: {
                     name: document.getElementById('fullName').value || 'Your Name',
                     role: document.getElementById('jobTitle').value || 'Your Job Title',
@@ -556,14 +535,8 @@
                 },
                 professionalSummary: document.getElementById('summary').value || '',
                 skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(s => s),
-                experience: [{ 
-                    company: 'Experience',
-                    description: document.getElementById('experience').value || '' 
-                }],
-                education: [{ 
-                    degree: 'Education',
-                    description: document.getElementById('education').value || '' 
-                }]
+                experience: [{ description: document.getElementById('experience').value || '' }],
+                education: [{ description: document.getElementById('education').value || '' }]
             };
 
             try {
@@ -579,13 +552,12 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage('✅ Resume saved to MongoDB Atlas!', 'success');
+                    showMessage('✅ Resume saved successfully!', 'success');
                 } else {
                     showMessage('❌ Failed to save: ' + data.message, 'error');
                 }
             } catch (error) {
                 showMessage('❌ Save failed: ' + error.message, 'error');
-                console.error('Save error:', error);
             }
         }
 
@@ -653,14 +625,12 @@
             .then(data => {
                 if (data.status === 'OK') {
                     console.log('✅ Backend API connected successfully');
-                    showMessage('✅ Connected to cloud backend!', 'success');
                 } else {
                     console.log('⚠️ Backend API connection issue');
                 }
             })
             .catch(error => {
                 console.log('❌ Cannot connect to backend API:', error);
-                showMessage('⚠️ Backend API not available. Using offline mode.', 'error');
             });
     </script>
 </body>
