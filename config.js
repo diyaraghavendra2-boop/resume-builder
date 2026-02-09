@@ -1,5 +1,6 @@
 // API Configuration
 // Backend deployed on Render
+// Updated: Connected to correct GitHub repository
 window.RESUME_BUILDER_CONFIG = {
     // For local development
     API_BASE: window.location.hostname === 'localhost' 
