@@ -6,5 +6,5 @@ window.RESUME_BUILDER_CONFIG = {
     API_BASE: window.location.hostname === 'localhost' 
         ? 'http://localhost:5001/api'
         // For production - Render backend
-        : 'https://resume-builder-mum7onrender.com/api'
+        : 'https://resume-builder-mum7.onrender.com/api'
 };
